@@ -59,7 +59,7 @@ ws.onmessage=function(event) {
 	}
 	
 	if (msg.content == "!clear")
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{
 			resetvisibles();
@@ -67,18 +67,18 @@ ws.onmessage=function(event) {
 			bg="#000000";
 		}
 	}
-    else if (msg.content.startsWith("!vote "))
-    {
+	else if (msg.content.startsWith("!vote "))
+	{
 		if (isBroadcaster(msg.user))
 		{
 			gametype = 'vote';
 			visiblevote = !visiblevote;
 			voteprop = msg.content.replace("!vote ","").split("/");
 			votes = [];
-        }
-    }		
+		}
+	}		
 	else if (msg.content == "!gnagnagna")
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{
 			ctx.clearRect(0,0,x,y);
@@ -86,21 +86,21 @@ ws.onmessage=function(event) {
 		}
 	}
 	else if (msg.content == "!clearchat")
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{
 			chat = [];	
 		}
-    }	
+	}	
 	else if (msg.content == "!theme")
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{
 			visibletheme = !visibletheme;
 		}
-    }
+	}
 	else if (msg.content == "!score")
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{		
 			resetvisibles();
@@ -109,9 +109,9 @@ ws.onmessage=function(event) {
 				visiblepoints = !visiblepoints;
 			}
 		}
-    }
+	}
 	else if (msg.content == "!total")
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{		
 			resetvisibles();
@@ -120,9 +120,9 @@ ws.onmessage=function(event) {
 				visibletotalpoints = !visibletotalpoints;
 			}
 		}
-    }	
-    else if (msg.content.startsWith("!start"))
-    {
+	}	
+	else if (msg.content.startsWith("!start"))
+	{
 		if (isBroadcaster(msg.user))
 		{
 			bg="#000000";
@@ -131,8 +131,8 @@ ws.onmessage=function(event) {
 			{
 				ws.send("!say Désolé mais cette liste n'existe pas !");
 			}
-            else
-            {
+			else
+			{
 				liste = songlist[parseInt(msg.content.replace("!start ", ""))].listname
 
 				points = [];
@@ -144,34 +144,34 @@ ws.onmessage=function(event) {
 				
 				songlist.find(x => x.listname === liste).done = true;
 				
-                if (songlist.find(x => x.listname === liste).type == 'single')
-                {
-                    gametype = "single";
-                }
-                
-                if (songlist.find(x => x.listname === liste).type == 'multi')
-                {                
-                    gametype = "multi";                
-                }
+				if (songlist.find(x => x.listname === liste).type == 'single')
+				{
+					gametype = "single";
+				}
 				
-                if (songlist.find(x => x.listname === liste).type == 'double')
-                {                
-                    gametype = "double";                
-                }                
-            }
+				if (songlist.find(x => x.listname === liste).type == 'multi')
+				{				
+					gametype = "multi";				
+				}
+				
+				if (songlist.find(x => x.listname === liste).type == 'double')
+				{				
+					gametype = "double";				
+				}				
+			}
 		}
-    }
-    else if (msg.content.startsWith("!next") || msg.content.startsWith("!go"))
-    {
+	}
+	else if (msg.content.startsWith("!next") || msg.content.startsWith("!go"))
+	{
 		if (isBroadcaster(msg.user))
 		{
 			bg="#000000";
 			resetvisibles();
-            songfound = false;
-            numberfound = 0;            
+			songfound = false;
+			numberfound = 0;			
 			songindex++;
-            ctx.clearRect(0,0,x,y);
-            drawTitle();
+			ctx.clearRect(0,0,x,y);
+			drawTitle();
 			
 			if (gametype == "single")
 			{
@@ -179,42 +179,42 @@ ws.onmessage=function(event) {
 				youtube = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).youtube;
 				alternate = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).alternate;
 				fullsongname = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).fullname;
-            }
+			}
 			
 			if (gametype == "double")
-            {
-                drawCadre("red");
-                drawDoubleTags();                
-            }
+			{
+				drawCadre("red");
+				drawDoubleTags();				
+			}
 		}
 	}
-    else if (msg.content.startsWith("!save"))
-    {
+	else if (msg.content.startsWith("!save"))
+	{
 		if (isBroadcaster(msg.user))
 		{
-            ws.send("!say Sauvegarde des données viewers (score et couleur)");
+			ws.send("!say Sauvegarde des données viewers (score et couleur)");
 			if (members.length > 0)ws.send(JSON.stringify(members));
 			if (totalpoints.length > 0)ws.send(JSON.stringify(totalpoints));
-        }
-    }
+		}
+	}
 	else if (msg.content.startsWith("!load"))
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{
 			ctx.clearRect(0,0,x,y);
-            ws.send("!say Récupération des données viewers (score et couleur) OK");
+			ws.send("!say Récupération des données viewers (score et couleur) OK");
 			ws.send("!load");
-        }
-    }
+		}
+	}
 	else if (msg.content.startsWith("!addpoints"))
-    {
+	{
 		if (isBroadcaster(msg.user))
 		{
 			var usr = msg.content.replace("!addpoints ","").split(" ")[0];
 			var pts = msg.content.replace("!addpoints ","").split(" ")[1];
 			ws.send("!say Adding " + pts + " point(s) to " + usr);
 			addPoints(parseInt(pts), usr);
-        }
+		}
 	}
 	else if (msg.content.startsWith("!botmembers"))
 	{
@@ -224,8 +224,8 @@ ws.onmessage=function(event) {
 	{
 		totalpoints = msg.replace("!bottotal", "");
 	}	
-    else if (msg.content.startsWith("!stop"))
-    {
+	else if (msg.content.startsWith("!stop"))
+	{
 		if (isBroadcaster(msg.user) && songfound == false && songindex >= 0)
 		{
 			if (gametype == "single")
@@ -235,8 +235,8 @@ ws.onmessage=function(event) {
 				drawSingleLose();
 
 				if (youtube != undefined)
-                {
-                  ws.send("!say Pour réécouter tranquillement : " + youtube);  
+				{
+					ws.send("!say Pour réécouter tranquillement : " + youtube);  
 				}
 				
 				if (songindex == songlist.find(x => x.listname === liste).songs.length - 1)
@@ -277,62 +277,62 @@ ws.onmessage=function(event) {
 					ws.send("!say C'était la dernière chanson de la liste ! Un point sur les scores !");  
 				} 				
 			}			
-		}        
-    }	
-    else if (msg.content.startsWith("!color "))
-    {
-        var color = msg.content.replace("!color ", "");
-        if (members == undefined)
-        {
-            members.push({'user':msg.user,'color':color});
-            return;
-        }
-        if (members.find(x => x.user === msg.user) != undefined)
-        {
-         members.find(x => x.user === msg.user).color = color;
-        }
-        else
-        {
-            members.push({'user':msg.user,'color':color});
-        }
-    }
-    else if (msg.content.startsWith("!helpcolor"))
-    {
+		}		
+	}	
+	else if (msg.content.startsWith("!color "))
+	{
+		var color = msg.content.replace("!color ", "");
+		if (members == undefined)
+		{
+			members.push({'user':msg.user,'color':color});
+			return;
+		}
+		if (members.find(x => x.user === msg.user) != undefined)
+		{
+			members.find(x => x.user === msg.user).color = color;
+		}
+		else
+		{
+			members.push({'user':msg.user,'color':color});
+		}
+	}
+	else if (msg.content.startsWith("!helpcolor"))
+	{
 		ws.send("!say Tapez !color + un code hexa (exemple : !color #FF00FF) ou une couleur (exemple !color purple) pour changer de couleur de pseudo ! Vous pouvez trouver le code hexa qui vous plaît sur https://htmlcolorcodes.com/fr/selecteur-de-couleur/");  
-    }	
-    else if (gametype == "single")
-    {
-        drawTitle();
+	}	
+	else if (gametype == "single")
+	{
+		drawTitle();
 		addChat(msg.user, msg.content, false);
-        if (songfound == false)
-        {
-            var ok = false;
-            if (similarity(msg.content, song) > 0.75)
-            {
-                ok = true;
-            }
-            if (alternate != '' && similarity(msg.content, alternate) > 0.75)
-            {
-                ok = true;
-            }
-            if (ok)
-            {
+		if (songfound == false)
+		{
+			var ok = false;
+			if (similarity(msg.content, song) > 0.75)
+			{
+				ok = true;
+			}
+			if (alternate != '' && similarity(msg.content, alternate) > 0.75)
+			{
+				ok = true;
+			}
+			if (ok)
+			{
 				chat[chat.length -1].found = true;
-                songfound = true;
-                userfound = msg.user;
-                drawSingleWin(userfound);
+				songfound = true;
+				userfound = msg.user;
+				drawSingleWin(userfound);
 				addPoints(1, msg.user);
 				ws.send("!say GivePLZ Bravo @" + msg.user + " ! 1 point de plus pour toi TakeNRG" );
-                
-                if (youtube != undefined)
-                {
-                  ws.send("!say Pour réécouter tranquillement : " + youtube);  
+				
+				if (youtube != undefined)
+				{
+					ws.send("!say Pour réécouter tranquillement : " + youtube);  
 				}
 			}
-        }
-        
-        if (songfound == true)
-        {
+		}
+		
+		if (songfound == true)
+		{
 			
 			if (userfound != "Personne")
 			{
@@ -343,10 +343,10 @@ ws.onmessage=function(event) {
 				drawSingleLose();
 			}
 		}
-    }
-    else if (gametype == "multi")
-    {
-        addChat(msg.user, msg.content, false);
+	}
+	else if (gametype == "multi")
+	{
+		addChat(msg.user, msg.content, false);
 		drawTitle();
 		
 		if (songindex >= 0)
@@ -391,8 +391,8 @@ ws.onmessage=function(event) {
 			}
 		}
 
-        if (numberfound == 6)
-        {
+		if (numberfound == 6)
+		{
 			drawCadre("green");
 
 			if (songfound == false)
@@ -404,20 +404,20 @@ ws.onmessage=function(event) {
 			}
 
 			songfound = true;
-        }
-        else
-        {
-            drawCadre("red");
-        }
-        drawMultiTags();
-        drawMultiSongs();            
-    }
-    else if (gametype == "double" && songfound == false)
-    {
-        addChat(msg.user, msg.content, false);
-        drawTitle();
-        if (songfound == false && songindex >= 0)
-        {
+		}
+		else
+		{
+			drawCadre("red");
+		}
+		drawMultiTags();
+		drawMultiSongs();			
+	}
+	else if (gametype == "double" && songfound == false)
+	{
+		addChat(msg.user, msg.content, false);
+		drawTitle();
+		if (songfound == false && songindex >= 0)
+		{
 			for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].info.length; i++){
 				var inf = songlist.find(x => x.listname === liste).songs[songindex].info[i].name;
 				var alt = songlist.find(x => x.listname === liste).songs[songindex].info[i].alternate;
@@ -441,15 +441,15 @@ ws.onmessage=function(event) {
 					chat[chat.length - 1].found = true;
 
 					songlist.find(x => x.listname === liste).songs[songindex].info[i].found = msg.user;
-                    numberfound++;
+					numberfound++;
 					addPoints(1, msg.user);
 					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 1 point de plus pour toi TakeNRG" );
 				}
 			}
 
-            if (numberfound == 2)
-            {
-                songfound = true;
+			if (numberfound == 2)
+			{
+				songfound = true;
 				drawCadre("green");
 				if (songlist.find(x => x.listname === liste).songs[songindex].info[0].youtube != undefined || songlist.find(x => x.listname === liste).songs[songindex].info[1].youtube != undefined)
 				{
@@ -462,20 +462,20 @@ ws.onmessage=function(event) {
 				if (songindex == songlist.find(x => x.listname === liste).songs.length - 1)
 				{
 					ws.send("!say C'était la dernière chanson de la liste ! Un point sur les scores !");  
-				}    
-            }
-            else 
-            {
-                drawCadre("red");
-            }
-        }
-        if (songfound == true)
-        {
-            drawCadre("green");
-        }
-        
-        drawDoubleTags();
-        drawDoubleInfo();        
+				}	
+			}
+			else 
+			{
+				drawCadre("red");
+			}
+		}
+		if (songfound == true)
+		{
+			drawCadre("green");
+		}
+		
+		drawDoubleTags();
+		drawDoubleInfo();		
 
 	}
 	else if (gametype == 'vote')
@@ -523,14 +523,14 @@ function drawTitle()
 
 	
 	ctx.strokeStyle = "white";
-	ctx.fillStyle = "black";          
+	ctx.fillStyle = "black";		  
 	roundRect(ctx,x/2 - 800, 10, 1600, 90, 20, true);
 
-	ctx.fillStyle = "white";          
+	ctx.fillStyle = "white";		  
 	ctx.font = '40px Trebuchet MS';
-    ctx.fillText(title, x/2 - ctx.measureText(title).width/2, 50);
-    ctx.font = '20px Trebuchet MS';
-    ctx.fillText(subtitle, x/2 - ctx.measureText(subtitle).width/2, 80);
+	ctx.fillText(title, x/2 - ctx.measureText(title).width/2, 50);
+	ctx.font = '20px Trebuchet MS';
+	ctx.fillText(subtitle, x/2 - ctx.measureText(subtitle).width/2, 80);
 }
 
 function drawCadre(color)
@@ -542,42 +542,42 @@ function drawCadre(color)
 
 function drawSingleWin(user)
 {
-        drawCadre("green");
-        
-        ctx.fillStyle = "white";
+		drawCadre("green");
+		
+		ctx.fillStyle = "white";
 		ctx.fillText("Bravo ", x/2 - 400 - ctx.measureText("Bravo " + user + " !").width/2, 160);
 		ctx.fillStyle = getUserColor(user);
 		ctx.fillText(user, x/2 - 400 - ctx.measureText("Bravo " + user + " !").width/2 + ctx.measureText("Bravo ").width, 160);
 		ctx.fillStyle = "white";
 		ctx.fillText(" !", x/2 - 400 - ctx.measureText("Bravo " + user + " !").width/2 + ctx.measureText("Bravo " + user).width, 160);
 		
-        ctx.fillText("La bonne réponse était", x/2 - 400 - ctx.measureText("La bonne réponse était").width/2, 200);
-        ctx.font = '30px Trebuchet MS';
-        ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
-        ctx.font = '20px Trebuchet MS';
+		ctx.fillText("La bonne réponse était", x/2 - 400 - ctx.measureText("La bonne réponse était").width/2, 200);
+		ctx.font = '30px Trebuchet MS';
+		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
+		ctx.font = '20px Trebuchet MS';
 }
 
 function drawSingleLose()
 {
-        drawCadre("red");
-        
-        ctx.fillStyle = "white";
+		drawCadre("red");
+		
+		ctx.fillStyle = "white";
 		ctx.fillText("C'est pas grave, c'était dur !", x/2 - 400 - ctx.measureText("C'est pas grave, c'était dur !").width/2, 160);
-        ctx.fillText("La bonne réponse était", x/2 - 400 - ctx.measureText("La bonne réponse était").width/2, 200);
-        ctx.font = '30px Trebuchet MS';
-        ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
-        ctx.font = '20px Trebuchet MS';
+		ctx.fillText("La bonne réponse était", x/2 - 400 - ctx.measureText("La bonne réponse était").width/2, 200);
+		ctx.font = '30px Trebuchet MS';
+		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
+		ctx.font = '20px Trebuchet MS';
 }
 
 function drawMultiTags()
 {
 	ctx.font = '18px Trebuchet MS';
 	ctx.fillStyle = "white";
-    ctx.fillText("Chanson 1 : ", x/2 - 750, 150);
-    ctx.fillText("Chanson 2 : ", x/2 - 750, 180);
-    ctx.fillText("Chanson 3 : ", x/2 - 750, 210);
-    ctx.fillText("Chanson 4 : ", x/2 - 750, 240);
-    ctx.fillText("Chanson 5 : ", x/2 - 750, 270);
+	ctx.fillText("Chanson 1 : ", x/2 - 750, 150);
+	ctx.fillText("Chanson 2 : ", x/2 - 750, 180);
+	ctx.fillText("Chanson 3 : ", x/2 - 750, 210);
+	ctx.fillText("Chanson 4 : ", x/2 - 750, 240);
+	ctx.fillText("Chanson 5 : ", x/2 - 750, 270);
 	ctx.fillText("Chanson 6 : ", x/2 - 750, 300);
 	ctx.font = '20px Trebuchet MS';
 }
@@ -585,16 +585,16 @@ function drawMultiTags()
 function drawMultiSongs()
 {
 	ctx.font = '18px Trebuchet MS';
-    for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
-        var mulsong = songlist.find(x => x.listname === liste).songs.find(x => x.found === i)
-        if (mulsong != undefined)
-        {
-            var usr = songlist.find(x => x.listname === liste).songs.find(x => x.found === i).user;
+	for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
+		var mulsong = songlist.find(x => x.listname === liste).songs.find(x => x.found === i)
+		if (mulsong != undefined)
+		{
+			var usr = songlist.find(x => x.listname === liste).songs.find(x => x.found === i).user;
 			ctx.fillStyle = getUserColor(usr);
-            ctx.fillText(usr, x/2 - 750 + ctx.measureText("Chanson X : ").width, 150 + 30*i);
+			ctx.fillText(usr, x/2 - 750 + ctx.measureText("Chanson X : ").width, 150 + 30*i);
 			ctx.fillStyle = "white";
-            ctx.fillText(" - " + mulsong.fullname, x/2 - 750 + ctx.measureText("Chanson X : " + usr).width, 150 + 30*i);
-        }
+			ctx.fillText(" - " + mulsong.fullname, x/2 - 750 + ctx.measureText("Chanson X : " + usr).width, 150 + 30*i);
+		}
 	}
 	ctx.font = '20px Trebuchet MS';
 }
@@ -603,9 +603,9 @@ function drawMultiSongs()
 function drawDoubleTags()
 {
 	ctx.fillStyle = "white";
-    ctx.fillText("2 informations à trouver :", x/2 - 400 - ctx.measureText("2 informations à trouver :").width/2, 160);
-    ctx.fillText(songlist.find(x => x.listname === liste).info1 + " : ", x/2 - 750, 210);
-    ctx.fillText(songlist.find(x => x.listname === liste).info2 + " : ", x/2 - 750, 270);
+	ctx.fillText("2 informations à trouver :", x/2 - 400 - ctx.measureText("2 informations à trouver :").width/2, 160);
+	ctx.fillText(songlist.find(x => x.listname === liste).info1 + " : ", x/2 - 750, 210);
+	ctx.fillText(songlist.find(x => x.listname === liste).info2 + " : ", x/2 - 750, 270);
 }
 
 function drawDoubleInfo()
@@ -630,7 +630,7 @@ function drawDoubleInfo()
 			ctx.fillText(usr2, x/2 - 750 + ctx.measureText(songlist.find(x => x.listname === liste).info2 + " : ").width, 270);
 			ctx.fillStyle = "white";
 			ctx.fillText(" - " + full, x/2 - 750 + ctx.measureText(songlist.find(x => x.listname === liste).info2 + " : " + usr2).width, 270);
-		}    
+		}	
 	}		
 }
 
@@ -841,8 +841,8 @@ function addChat(user, message, found) {
 
 function drawChat()
 {
-		ctx.fillStyle = "black";    
-		ctx.strokeStyle="white";    
+		ctx.fillStyle = "black";	
+		ctx.strokeStyle="white";	
 
 		roundRect(ctx, x/2, 120, 800, 700, 20, true);
 
@@ -877,71 +877,74 @@ function similarity(s1, s2) {
   var longer = s1;
   var shorter = s2;
   if (s1.length < s2.length) {
-    longer = s2;
-    shorter = s1;
+	longer = s2;
+	shorter = s1;
   }
   var longerLength = longer.length;
   if (longerLength == 0) {
-    return 1.0;
+	return 1.0;
   }
   return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
 }
 
-function editDistance(s1, s2) {
+function editDistance(s1, s2){
   s1 = s1.toLowerCase();
   s2 = s2.toLowerCase();
 
   var costs = new Array();
-  for (var i = 0; i <= s1.length; i++) {
-    var lastValue = i;
-    for (var j = 0; j <= s2.length; j++) {
-      if (i == 0)
-        costs[j] = j;
-      else {
-        if (j > 0) {
-          var newValue = costs[j - 1];
-          if (s1.charAt(i - 1) != s2.charAt(j - 1))
-            newValue = Math.min(Math.min(newValue, lastValue),
-              costs[j]) + 1;
-          costs[j - 1] = lastValue;
-          lastValue = newValue;
-        }
-      }
-    }
-    if (i > 0)
-      costs[s2.length] = lastValue;
+  for (var i = 0; i <= s1.length; i++)
+  {
+	var lastValue = i;
+	for (var j = 0; j <= s2.length; j++)
+	{
+		if (i == 0)
+			costs[j] = j;
+		else {
+			if (j > 0)
+			{
+				var newValue = costs[j - 1];
+				if (s1.charAt(i - 1) != s2.charAt(j - 1))
+					newValue = Math.min(Math.min(newValue, lastValue),
+				costs[j]) + 1;
+				costs[j - 1] = lastValue;
+				lastValue = newValue;
+			}
+		}
+	}
+	if (i > 0)
+		costs[s2.length] = lastValue;
   }
   return costs[s2.length];
 }
 
 function isBroadcaster(user){
-    return user.badges.broadcaster == '1';
+	return user.badges.broadcaster == '1';
 }
 
 function hashCode(str) { // java String#hashCode
-    var hash = 0;
-    for (var i = 0; i < str.length; i++) {
-       hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return hash;
+	var hash = 0;
+	for (var i = 0; i < str.length; i++) {
+		hash = str.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	return hash;
 } 
 
 function intToRGB(i){
-    var c = (i & 0x00FFFFFF)
-        .toString(16)
-        .toUpperCase();
+	var c = (i & 0x00FFFFFF)
+		.toString(16)
+		.toUpperCase();
 
-    return "00000".substring(0, 6 - c.length) + c;
+	return "00000".substring(0, 6 - c.length) + c;
 }
 
 function getUserColor(username)
 {
 	var usr = members.find(x => x.user === username);
-    var color = ctx.fillStyle = "#" + intToRGB(hashCode(username));
-    if (usr != undefined)
-    {
-     color = ctx.fillStyle = usr.color;   
-    }
+	var color = ctx.fillStyle = "#" + intToRGB(hashCode(username));
+	if (usr != undefined)
+	{
+		color = ctx.fillStyle = usr.color;   
+	}
 	return color;
 }
 
@@ -963,7 +966,7 @@ function resetvisibles()
  * @param {Number} width The width of the rectangle
  * @param {Number} height The height of the rectangle
  * @param {Number} [radius = 5] The corner radius; It can also be an object 
- *                 to specify different radii for corners
+ *				 to specify different radii for corners
  * @param {Number} [radius.tl = 0] Top left
  * @param {Number} [radius.tr = 0] Top right
  * @param {Number} [radius.br = 0] Bottom right
