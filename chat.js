@@ -550,6 +550,15 @@ function drawTitle()
 	ctx.fillText(title, x/2 - ctx.measureText(title).width/2, 50);
 	ctx.font = '20px Trebuchet MS';
 	ctx.fillText(subtitle, x/2 - ctx.measureText(subtitle).width/2, 80);
+
+	if (gametype == 'single' || gametype == 'double')
+	{
+		ctx.font = '40px Trebuchet MS';
+		var tot = songlist.find(x => x.listname === liste).songs.length;
+		console.log(tot);
+		ctx.fillText((songindex + 1)  + "/" + tot, x/2 - 700, 68);
+		ctx.font = '20px Trebuchet MS';
+	}	
 }
 
 function drawCadre(color)
