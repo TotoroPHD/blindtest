@@ -60,7 +60,7 @@ ws.onmessage=function(event) {
 	
 	if (msg.content == "!clear")
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			resetvisibles();
 			ctx.clearRect(0,0,x,y);
@@ -69,7 +69,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!vote "))
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			gametype = 'vote';
 			visiblevote = !visiblevote;
@@ -79,7 +79,7 @@ ws.onmessage=function(event) {
 	}		
 	else if (msg.content == "!gnagnagna")
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			ctx.clearRect(0,0,x,y);
 			bg="#444444";
@@ -87,21 +87,21 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content == "!clearchat")
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			chat = [];	
 		}
 	}	
 	else if (msg.content == "!theme")
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			visibletheme = !visibletheme;
 		}
 	}
 	else if (msg.content == "!score")
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{		
 			resetvisibles();
 			if (points.length > 0)
@@ -112,7 +112,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content == "!total")
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{		
 			resetvisibles();
 			if (totalpoints.length > 0)
@@ -123,7 +123,7 @@ ws.onmessage=function(event) {
 	}	
 	else if (msg.content.startsWith("!start"))
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			bg="#000000";
 			resetvisibles();
@@ -163,7 +163,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!next") || msg.content.startsWith("!go"))
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			bg="#000000";
 			resetvisibles();
@@ -190,7 +190,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!save"))
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			ws.send("!say Sauvegarde des données viewers (score et couleur)");
 			if (members.length > 0)ws.send(JSON.stringify(members));
@@ -199,7 +199,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!load"))
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{
 			ctx.clearRect(0,0,x,y);
 			ws.send("!say Récupération des données viewers (score et couleur) OK");
@@ -208,7 +208,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!addpoints"))
 	{
-		if (isBroadcaster(msg.user))
+		if (msg.isBroadcaster)
 		{		
 			var pts;
 			var usr;
@@ -245,7 +245,7 @@ ws.onmessage=function(event) {
 	}	
 	else if (msg.content.startsWith("!stop"))
 	{
-		if (isBroadcaster(msg.user) && songfound == false && songindex >= 0)
+		if (msg.isBroadcaster && songfound == false && songindex >= 0)
 		{
 			if (gametype == "single")
 			{
@@ -943,10 +943,6 @@ function editDistance(s1, s2){
 		costs[s2.length] = lastValue;
   }
   return costs[s2.length];
-}
-
-function isBroadcaster(user){
-	return user.badges.broadcaster == '1';
 }
 
 function hashCode(str) { // java String#hashCode

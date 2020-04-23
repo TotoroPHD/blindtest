@@ -38,7 +38,7 @@ ws.on('connection', function (ws) {
     {
      message = message.substring(0, 100) + "...";   
     }
-    ws.send('{ "user":"'+user['display-name']+'", "content":"'+message+'"}' ); 
+    ws.send('{ "user":"'+user['display-name']+'", "content":"'+message+'", "isBroadcaster":"'+isBroadcaster(user)+'"}' ); 
   });   
 
   ws.on("close", function() {
@@ -89,4 +89,12 @@ function isJson(str) {
         return false;
     }
     return true;
+}
+
+function isBroadcaster(user){
+  if (user.badges != null)
+  {
+    return user.badges.broadcaster == '1';
+  }
+  else return false;
 }
