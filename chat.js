@@ -209,11 +209,30 @@ ws.onmessage=function(event) {
 	else if (msg.content.startsWith("!addpoints"))
 	{
 		if (isBroadcaster(msg.user))
-		{
-			var usr = msg.content.replace("!addpoints ","").split(" ")[0];
-			var pts = msg.content.replace("!addpoints ","").split(" ")[1];
-			ws.send("!say Adding " + pts + " point(s) to " + usr);
-			addPoints(parseInt(pts), usr);
+		{		
+			var pts;
+			var usr;
+			var ar = msg.content.replace("!addpoints ","").split(" ");
+			if (isNaN(parseInt(ar[0])) && isNaN(parseInt(ar[1])))
+			{
+				ws.send("!say Erreur d'ajout des points");
+			}
+
+			if (!isNaN(parseInt(ar[0])) && isNaN(parseInt(ar[1])))
+			{
+				pts = msg.content.replace("!addpoints ","").split(" ")[0];
+				usr = msg.content.replace("!addpoints ","").split(" ")[1];
+				ws.send("!say Adding " + pts + " point(s) to " + usr);
+				addPoints(parseInt(pts), usr);				
+			}
+
+			if (isNaN(parseInt(ar[0])) && !isNaN(parseInt(ar[1])))
+			{
+				usr = msg.content.replace("!addpoints ","").split(" ")[0];
+				pts = msg.content.replace("!addpoints ","").split(" ")[1];
+				ws.send("!say Adding " + pts + " point(s) to " + usr);
+				addPoints(parseInt(pts), usr);				
+			}
 		}
 	}
 	else if (msg.content.startsWith("!botmembers"))
