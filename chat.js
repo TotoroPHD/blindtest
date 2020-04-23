@@ -1,5 +1,5 @@
 /* eslint-disable no-redeclare */
-var ws = new WebSocket("localhost:8100");
+var ws = new WebSocket("ws://localhost:8100");
 var x = 1900;
 var y = 900;
 
