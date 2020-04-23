@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'Trebuchet MS';
+    src: url('trebuc.ttf');
+}
+
+p  {
+  color: white;
+  font-family: 'Trebuchet MS';
+  font-size: 100%;
+}
