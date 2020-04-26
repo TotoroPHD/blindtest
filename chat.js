@@ -754,11 +754,20 @@ function displayPoints()
 {
 	if (visiblepoints || visibletotalpoints)
 	{
+		var maxheight = 20;
 		var disppoints = [];
 		if (visiblepoints){disppoints = Array.from(points);}else{disppoints = Array.from(totalpoints);}
-		var hpoints = disppoints.length * 40 + 80 ;
+		var column = 1 + Math.trunc((disppoints.length-1)/maxheight);
+		console.log("column nb = " + column);
 
-		ctx.clearRect(x/2 - 500, 320 - hpoints/2, 200, hpoints);
+		var hpoints = 90 + disppoints.length * 25;
+		if (disppoints.length > 20)
+		{
+			hpoints = 90 + 20 * 25
+		}
+		var wpoints = 200 * column;
+
+		ctx.clearRect(x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints);
 
 		disppoints.sort((a, b) => a.points - b.points);
 		disppoints.reverse();
@@ -766,22 +775,30 @@ function displayPoints()
 		ctx.fillStyle=bg;
 		if (visiblepoints){ctx.strokeStyle="orange";}else{ctx.strokeStyle="purple";}
 		
-		roundRect(ctx, x/2 - 500, 320 - hpoints/2, 200, hpoints, 20, true);
+		roundRect(ctx, x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints, 20, true);
 		
 		ctx.font = '40px Trebuchet MS';
 		ctx.fillStyle=ctx.strokeStyle;
-		
 		ctx.fillText("Scores", x/2 - 400 - ctx.measureText("Scores").width/2, 320 - hpoints/2 + 50);
+
 		ctx.font = '20px Trebuchet MS';
 		
 		for (var i = 0; i <= disppoints.length - 1; i++) {
+			var curcol = 1 + Math.trunc(i/maxheight);
+			console.log(curcol);
+			var colx = 0;
+			colx = 200*curcol - 100 - 200*(column/2);
+			console.log(colx);
+			var curi = i%maxheight;
+			
 			var usr = disppoints[i].user;
 			var pts = disppoints[i].points;
 			
 			ctx.fillStyle=getUserColor(usr);
-			ctx.fillText(usr + " - ", x/2 - 400 - ctx.measureText(usr + " - " + pts).width/2, 320 - hpoints/2 + 90 + i*40);
+			ctx.fillText(usr + " - ", x/2 - 400 + colx - ctx.measureText(usr + " - " + pts).width/2, 320 - hpoints/2 + 90 + curi*25);
+
 			ctx.fillStyle="white";
-			ctx.fillText(pts, x/2 - 400 - ctx.measureText(usr + " - " + pts).width/2+ ctx.measureText(usr + " - ").width, 320 - hpoints/2 + 90 + i*40);
+			ctx.fillText(pts, x/2 - 400 + colx - ctx.measureText(usr + " - " + pts).width/2+ ctx.measureText(usr + " - ").width, 320 - hpoints/2 + 90 + curi*25);
 		}
 		ctx.fillStyle="white";
 		ctx.strokeStyle="white";
