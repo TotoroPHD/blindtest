@@ -256,7 +256,14 @@ ws.onmessage=function(event) {
 			]
 			ws.send(shout[Math.floor(Math.random() * 4)]);
 		}
-	}		
+	}
+	else if (msg.content.startsWith("!github"))
+	{
+		if (msg.isBroadcaster)
+		{
+			ws.send("!say https://github.com/TotoroPHD/blindtest");  
+		}
+	}
 	else if (msg.content.startsWith("!stop"))
 	{
 		if (msg.isBroadcaster && songfound == false && songindex >= 0)
