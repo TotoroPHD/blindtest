@@ -242,7 +242,21 @@ ws.onmessage=function(event) {
 	else if (msg.content.startsWith("!bottotal"))
 	{
 		totalpoints = msg.replace("!bottotal", "");
-	}	
+	}
+	else if (msg.content.startsWith("!so "))
+	{
+		if (msg.isBroadcaster)
+		{
+			var so = msg.content.replace("!so ", "").replace("@", "");
+			var shout = [
+				"!say N'hésitez pas à aller faire un tour sur la chaîne Twitch de " + so + " ! C'est par ici : twitch.tv/" + so,
+				"!say Du contenu de qualité sur la chaîne de " + so + " ! Allez donc follow par ici : twitch.tv/" + so,
+				"!say On va tous follow la chaîne de " + so + " ! C'est par là : twitch.tv/" + so,
+				"!say Bonne ambiance et contenu de qualité chez " + so + " ! Pour follow : twitch.tv/" + so,
+			]
+			ws.send(shout[Math.floor(Math.random() * 4)]);
+		}
+	}		
 	else if (msg.content.startsWith("!stop"))
 	{
 		if (msg.isBroadcaster && songfound == false && songindex >= 0)
