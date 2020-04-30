@@ -22,6 +22,7 @@ var visibletotalpoints = false;
 var visiblevote = false;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
 var youtube;
+var winImage;
 var alternate = '';
 var fullsongname;
 var liste = "begin";
@@ -177,8 +178,10 @@ ws.onmessage=function(event) {
 			{
 				song = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).name;
 				youtube = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).youtube;
+				winImage = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).winImage;
 				alternate = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).alternate;
 				fullsongname = songlist.find(x => x.listname === liste).songs.find(x => x.index === songindex.toString()).fullname;
+
 			}
 			
 			if (gametype == "double")
@@ -576,7 +579,6 @@ function drawTitle()
 	{
 		ctx.font = '40px Trebuchet MS';
 		var tot = songlist.find(x => x.listname === liste).songs.length;
-		console.log(tot);
 		ctx.fillText((songindex + 1)  + "/" + tot, x/2 - 700, 68);
 		ctx.font = '20px Trebuchet MS';
 	}	
@@ -604,6 +606,39 @@ function drawSingleWin(user)
 		ctx.font = '30px Trebuchet MS';
 		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
 		ctx.font = '20px Trebuchet MS';
+
+		if (winImage != undefined)
+		{
+			drawWinImage();
+		}
+}
+
+function drawWinImage()
+{
+	var img = new Image();   // Crée un nouvel élément Image
+	console.log(img);
+	img.src = './images/'+winImage; // Définit le chemin vers sa source
+	img.onload = function() {
+		var hRatio = 380/img.width;
+		var vRatio = 480/img.height;
+		var ratio  = Math.min ( hRatio, vRatio );
+
+		var xoffset = 0;
+		var yoffset = 0;
+		if (ratio == hRatio)
+		{
+			yoffset = Math.round((480 - img.height*ratio)/2);
+		}
+		else
+		{
+			xoffset = Math.round((380 - img.width*ratio)/2);
+		}
+		console.log(yoffset);
+		ctx.fillStyle='white';
+		ctx.strokeStyle='white';
+		ctx.drawImage(img, 0,0, img.width, img.height, x/2 - 400 + xoffset, 340 + yoffset, img.width*ratio, img.height*ratio);
+		roundRect(ctx,x/2-400, 340, 380,480,5,false);
+	}
 }
 
 function drawSingleLose()
@@ -616,6 +651,11 @@ function drawSingleLose()
 		ctx.font = '30px Trebuchet MS';
 		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
 		ctx.font = '20px Trebuchet MS';
+
+		if (winImage != undefined)
+		{
+			drawWinImage();
+		}		
 }
 
 function drawMultiTags()
