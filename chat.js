@@ -20,6 +20,7 @@ var visiblepoints = false;
 var visibletheme = false;
 var visibletotalpoints = false;
 var visiblevote = false;
+var visiblewin = false;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
 var youtube;
 var winImage;
@@ -97,6 +98,7 @@ ws.onmessage=function(event) {
 	{
 		if (msg.isBroadcaster)
 		{
+			resetvisibles();
 			visibletheme = !visibletheme;
 		}
 	}
@@ -274,6 +276,7 @@ ws.onmessage=function(event) {
 			if (gametype == "single")
 			{
 				songfound = true;
+				visiblewin = true;
 				userfound = "Personne";
 				drawSingleLose();
 
@@ -360,6 +363,7 @@ ws.onmessage=function(event) {
 			}
 			if (ok)
 			{
+				visiblewin = true;
 				chat[chat.length -1].found = true;
 				songfound = true;
 				userfound = msg.user;
@@ -594,7 +598,7 @@ function drawCadre(color)
 function drawSingleWin(user)
 {
 		drawCadre("green");
-		
+
 		ctx.fillStyle = "white";
 		ctx.fillText("Bravo ", x/2 - 400 - ctx.measureText("Bravo " + user + " !").width/2, 160);
 		ctx.fillStyle = getUserColor(user);
@@ -607,7 +611,7 @@ function drawSingleWin(user)
 		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
 		ctx.font = '20px Trebuchet MS';
 
-		if (winImage != undefined)
+		if (winImage != undefined && visiblewin)
 		{
 			drawWinImage();
 		}
@@ -644,7 +648,7 @@ function drawWinImage()
 function drawSingleLose()
 {
 		drawCadre("red");
-		
+
 		ctx.fillStyle = "white";
 		ctx.fillText("C'est pas grave, c'était dur !", x/2 - 400 - ctx.measureText("C'est pas grave, c'était dur !").width/2, 160);
 		ctx.fillText("La bonne réponse était", x/2 - 400 - ctx.measureText("La bonne réponse était").width/2, 200);
@@ -652,7 +656,7 @@ function drawSingleLose()
 		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
 		ctx.font = '20px Trebuchet MS';
 
-		if (winImage != undefined)
+		if (winImage != undefined && visiblewin)
 		{
 			drawWinImage();
 		}		
@@ -1056,6 +1060,7 @@ function resetvisibles()
 	visibletotalpoints = false;
 	visibletheme = false;
 	visiblevote = false;
+	visiblewin = false;
 }
 
 /**
