@@ -16,11 +16,6 @@ var numberfound = 0;
 var songfound = false;
 var userfound = "";
 var songindex = 0;
-var visiblepoints = false;
-var visibletheme = false;
-var visibletotalpoints = false;
-var visiblevote = false;
-var visiblewin = false;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
 var youtube;
 var winImage;
@@ -28,6 +23,12 @@ var alternate = '';
 var fullsongname;
 var liste = "begin";
 var bg = "#000000";
+
+var visiblepoints = false;
+var visibletheme = false;
+var visibletotalpoints = false;
+var visiblevote = false;
+var visiblewin = false;
 
 var canvas = document.getElementById("canvas");
 
@@ -42,7 +43,7 @@ ctx.lineWidth = 5;
 
 ws.onmessage=function(event) {
 	var msg = JSON.parse(event.data);
-	
+
 	if (msg[0] != undefined)
 	{
 		if (msg[0].color != undefined)
@@ -60,9 +61,11 @@ ws.onmessage=function(event) {
 		return;
 	}
 	
+	console.log(msg.user + " est broadcaster : " + msg.isBroadcaster);
+
 	if (msg.content == "!clear")
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			resetvisibles();
 			ctx.clearRect(0,0,x,y);
@@ -71,7 +74,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!vote "))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			gametype = 'vote';
 			visiblevote = !visiblevote;
@@ -81,7 +84,7 @@ ws.onmessage=function(event) {
 	}		
 	else if (msg.content == "!gnagnagna")
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			ctx.clearRect(0,0,x,y);
 			bg="#444444";
@@ -89,14 +92,14 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content == "!clearchat")
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			chat = [];	
 		}
 	}	
 	else if (msg.content == "!theme")
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			resetvisibles();
 			visibletheme = !visibletheme;
@@ -104,7 +107,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content == "!score")
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{		
 			resetvisibles();
 			if (points.length > 0)
@@ -115,7 +118,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content == "!total")
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{		
 			resetvisibles();
 			if (totalpoints.length > 0)
@@ -126,7 +129,7 @@ ws.onmessage=function(event) {
 	}	
 	else if (msg.content.startsWith("!start"))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			bg="#000000";
 			resetvisibles();
@@ -166,7 +169,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!next") || msg.content.startsWith("!go"))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			bg="#000000";
 			resetvisibles();
@@ -195,7 +198,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!save"))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			ws.send("!say Sauvegarde des données viewers (score et couleur)");
 			if (members.length > 0)ws.send(JSON.stringify(members));
@@ -204,7 +207,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!load"))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			ctx.clearRect(0,0,x,y);
 			ws.send("!say Récupération des données viewers (score et couleur) OK");
@@ -213,7 +216,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!addpoints"))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{		
 			var pts;
 			var usr;
@@ -250,7 +253,7 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!so "))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			var so = msg.content.replace("!so ", "").replace("@", "");
 			var shout = [
@@ -264,14 +267,14 @@ ws.onmessage=function(event) {
 	}
 	else if (msg.content.startsWith("!github"))
 	{
-		if (msg.isBroadcaster)
+		if (msg.isBroadcaster == "true")
 		{
 			ws.send("!say https://github.com/TotoroPHD/blindtest");  
 		}
 	}
 	else if (msg.content.startsWith("!stop"))
 	{
-		if (msg.isBroadcaster && songfound == false && songindex >= 0)
+		if (msg.isBroadcaster == "true" && songfound == false && songindex >= 0)
 		{
 			if (gametype == "single")
 			{
