@@ -861,6 +861,8 @@ function redraw()
 	{
 		displayVote();		
 	}		
+
+	roundRect(ctx,150,320,780,580);
 }
 
 function addPoints(amount, user)
@@ -1011,7 +1013,7 @@ function displayVote()
 function addChat(user, message, found, cur) {
   if (canvas.getContext) {
 
-	if (chat.length == 22)
+	if (chat.length == 25)
 	{
 		chat.shift();
 	}
@@ -1025,9 +1027,9 @@ function drawChat()
 		ctx.fillStyle = "black";	
 		ctx.strokeStyle="white";	
 
-		roundRect(ctx, x/2, 120, 800, 700, 20, true);
+		roundRect(ctx, x/2, 120, 800, 775, 20, true);
 
-		var offset = 22 - chat.length;
+		var offset = 25 - chat.length;
 		if (chat.length > 0)
 		{
 			for (var i = chat.length - 1; i >= 0; i--)
