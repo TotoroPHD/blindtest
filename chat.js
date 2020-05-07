@@ -14,6 +14,12 @@ var votes = [];
 
 var chat = [];
 
+
+var defaultdelay = 700;
+var delay = 0;
+var countdown = -1;
+var ready = false;
+
 var nbwin = 3;
 var singlewin = [];
 
@@ -173,6 +179,13 @@ ws.onmessage=function(event) {
 	{
 		if (msg.isBroadcaster == "true" && songindex < songlist.find(x => x.listname === liste).songs.length - 1)
 		{
+			if (gametype == "single" || gametype == "double")
+			{
+				ws.send("!say Prochaine chanson dans...")
+				countdown = delay;
+				ready = false;
+			}
+
 			bg="#000000";
 			resetvisibles();
 			songfound = false;
@@ -263,6 +276,12 @@ ws.onmessage=function(event) {
 				}
 				else nbwin = 3;
 
+				if (songlist.find(x => x.listname === liste).delay != undefined)
+				{
+					delay = parseInt(songlist.find(x => x.listname === liste).delay) * 100;
+				}
+				else delay = defaultdelay;				
+
 				if (songlist.find(x => x.listname === liste).type == 'single')
 				{
 					gametype = "single";
@@ -289,6 +308,9 @@ ws.onmessage=function(event) {
 			songfound = true;
 			visiblewin = true;
 			
+			countdown = -1;
+			ready = false;
+
 			for (var i = 0; i < chat.length; i++)chat[i].cur="no";
 
 			if (gametype == "single")
@@ -361,7 +383,7 @@ ws.onmessage=function(event) {
 			votes = [];
 		}
 	}		
-	else if (gametype == "single")
+	else if (gametype == "single" && ready == true)
 	{
 		addChat(msg.user, msg.content, "", "yes");
 
@@ -397,6 +419,10 @@ ws.onmessage=function(event) {
 				{
 					visiblewin = true;
 					songfound = true;
+
+					countdown = -1;
+					ready = false;
+
 					drawSingleWin();
 					givePoints(singlewin);
 					
@@ -410,7 +436,7 @@ ws.onmessage=function(event) {
 			}
 		}
 	}
-	else if (gametype == "double")
+	else if (gametype == "double" && ready == true)
 	{
 		addChat(msg.user, msg.content, "", "yes");
 		if (songfound == false && songindex >= 0)
@@ -472,6 +498,9 @@ ws.onmessage=function(event) {
 				{
 					visiblewin = true;
 					songfound = true;
+
+					countdown = -1;
+					ready = false;
 					
 					if (youtube != undefined)
 					{
@@ -746,28 +775,26 @@ function givePoints(win)
 function drawWinImage()
 {
 	var img = new Image();   // Crée un nouvel élément Image
-	console.log(img);
 	img.src = winImage; // Définit le chemin vers sa source
 	img.onload = function() {
 		var hRatio = 380/img.width;
-		var vRatio = 480/img.height;
+		var vRatio = 555/img.height;
 		var ratio  = Math.min ( hRatio, vRatio );
 
 		var xoffset = 0;
 		var yoffset = 0;
 		if (ratio == hRatio)
 		{
-			yoffset = Math.round((480 - img.height*ratio)/2);
+			yoffset = Math.round((555 - img.height*ratio)/2);
 		}
 		else
 		{
 			xoffset = Math.round((380 - img.width*ratio)/2);
 		}
-		console.log(yoffset);
 		ctx.fillStyle='white';
 		ctx.strokeStyle='white';
 		ctx.drawImage(img, 0,0, img.width, img.height, x/2 - 400 + xoffset, 340 + yoffset, img.width*ratio, img.height*ratio);
-		roundRect(ctx,x/2-400, 340, 380,480,5,false);
+		roundRect(ctx,x/2-400, 340, 380,555,5,false);
 	}
 }
 
@@ -861,8 +888,6 @@ function redraw()
 	{
 		displayVote();		
 	}		
-
-	roundRect(ctx,150,320,780,580);
 }
 
 function addPoints(amount, user)
@@ -873,8 +898,12 @@ function addPoints(amount, user)
 	}
 	else
 	{
-		points.push({'user':user,'points':amount});	
+		points.push({'user':user,'points':amount, 'gold':0, 'silver':0, 'bronze':0});	
 	}
+
+	if(amount == 3)points.find(x => x.user === user).gold+=1;
+	if(amount == 2)points.find(x => x.user === user).silver+=1;
+	if(amount == 1)points.find(x => x.user === user).bronze+=1;
 
 	if (liste != "exemple")
 	{
@@ -884,8 +913,12 @@ function addPoints(amount, user)
 		}
 		else
 		{
-			totalpoints.push({'user':user,'points':amount});	
+			totalpoints.push({'user':user,'points':amount, 'gold':0, 'silver':0, 'bronze':0});	
 		}	
+		
+		if(amount == 3)totalpoints.find(x => x.user === user).gold+=1;
+		if(amount == 2)totalpoints.find(x => x.user === user).silver+=1;
+		if(amount == 1)totalpoints.find(x => x.user === user).bronze+=1;
 	}
 }
 
@@ -897,14 +930,13 @@ function displayPoints()
 		var disppoints = [];
 		if (visiblepoints){disppoints = Array.from(points);}else{disppoints = Array.from(totalpoints);}
 		var column = 1 + Math.trunc((disppoints.length-1)/maxheight);
-		console.log("column nb = " + column);
 
 		var hpoints = 90 + disppoints.length * 25;
-		if (disppoints.length > 20)
+		if (disppoints.length > maxheight)
 		{
-			hpoints = 90 + 20 * 25
+			hpoints = 90 + maxheight * 25
 		}
-		var wpoints = 200 * column;
+		var wpoints = 300 * column;
 
 		ctx.clearRect(x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints);
 
@@ -915,32 +947,39 @@ function displayPoints()
 		if (visiblepoints){ctx.strokeStyle="orange";}else{ctx.strokeStyle="purple";}
 		
 		roundRect(ctx, x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints, 20, true);
-		
+		console.log("hpoints = " + hpoints);
+
 		ctx.font = '40px Trebuchet MS';
 		ctx.fillStyle=ctx.strokeStyle;
 		ctx.fillText("Scores", x/2 - 400 - ctx.measureText("Scores").width/2, 320 - hpoints/2 + 50);
 
-		ctx.font = '20px Trebuchet MS';
+		ctx.font = '18px Trebuchet MS';
 		
 		for (var i = 0; i <= disppoints.length - 1; i++) {
 			var curcol = 1 + Math.trunc(i/maxheight);
-			console.log(curcol);
 			var colx = 0;
-			colx = 200*curcol - 100 - 200*(column/2);
-			console.log(colx);
+			colx = 300*curcol - 150 - 300*(column/2);
 			var curi = i%maxheight;
 			
 			var usr = disppoints[i].user;
 			var pts = disppoints[i].points;
+			var gold = disppoints[i].gold;
+			var silver = disppoints[i].silver;
+			var bronze = disppoints[i].bronze;
 			
+			var wscore = ctx.measureText(usr + pts + "🥇🥇🥇 - " + gold + silver + bronze).width;
+			console.log(wscore);
+
 			ctx.fillStyle=getUserColor(usr);
-			ctx.fillText(usr + " - ", x/2 - 400 + colx - ctx.measureText(usr + " - " + pts).width/2, 320 - hpoints/2 + 90 + curi*25);
+			ctx.fillText(usr, x/2 - 400 + colx - wscore/2, 320 - hpoints/2 + 90 + curi*25);
 
 			ctx.fillStyle="white";
-			ctx.fillText(pts, x/2 - 400 + colx - ctx.measureText(usr + " - " + pts).width/2+ ctx.measureText(usr + " - ").width, 320 - hpoints/2 + 90 + curi*25);
+
+			ctx.fillText(" 🥇"+gold+"🥈"+silver+"🥉"+bronze+" - "+pts , x/2 - 400 + colx - wscore/2 + ctx.measureText(usr).width, 320 - hpoints/2 + 90 + curi*25);
 		}
 		ctx.fillStyle="white";
 		ctx.strokeStyle="white";
+		ctx.font = '20px Trebuchet MS';
 	}
 }
 
@@ -1190,3 +1229,20 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 		ctx.stroke();
 	}
   }
+
+  setInterval(function() {
+	if (countdown > 0)
+	{
+		if (countdown%100 == 0)
+		{
+			ws.send("!say " + countdown/100 + "...");
+		}
+		countdown--;
+	}
+	
+	if (countdown == 0 && ready == false)
+	{
+		ws.send("!say GO !");
+		ready = true;
+	}
+  }, 10);
