@@ -1,6 +1,5 @@
 /* eslint-disable no-redeclare */
 var ws = new WebSocket("ws://localhost:8100");
-
 var x = 1900;
 var y = 900;
 
@@ -181,8 +180,11 @@ ws.onmessage=function(event) {
 		{
 			if (gametype == "single" || gametype == "double")
 			{
-				ws.send("!say Prochaine chanson dans...")
 				countdown = delay;
+				if (countdown > 0)
+				{
+					ws.send("!say Prochaine chanson dans...")
+				}
 				ready = false;
 			}
 
@@ -998,7 +1000,7 @@ function displayThemes()
 		ctx.font = '20px Trebuchet MS';
 		for (var i = 0; i <= songlist.length - 1; i++) {
 			
-			var the = songlist[i].theme;
+			var the = songlist[i].title;
 			var done = songlist[i].done;
 			
 			if (done == true)
