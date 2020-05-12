@@ -36,6 +36,7 @@ var youtube;
 var winImage;
 var alternate = '';
 var fullsongname;
+var singletext = '';
 var liste = "begin";
 var bg = "#000000";
 
@@ -212,6 +213,7 @@ ws.onmessage=function(event) {
 				song = songlist.find(x => x.listname === liste).songs[songindex].name;
 				alternate = songlist.find(x => x.listname === liste).songs[songindex].alternate;
 				fullsongname = songlist.find(x => x.listname === liste).songs[songindex].fullname;
+				singletext = songlist.find(x => x.listname === liste).songs[songindex].singletext;
 			}
 			
 			if (gametype == "double")
@@ -841,10 +843,26 @@ function redraw()
 {
 	ctx.clearRect(0,0,x,y);
 
-	if (gametype == "single" && songfound == true)
+	if (gametype == "single")
 	{
-		if (singlewin.length == 0)drawSingleLose();
-		else drawSingleWin();
+		if (songfound == false)
+		{
+			drawCadre("white");
+			console.log(singletext);
+			if (singletext != undefined)
+			{
+				ctx.font = '40px Trebuchet MS';
+				ctx.fillStyle = 'white';
+				ctx.fillText(singletext, x/2 - 400 - ctx.measureText(singletext).width/2, 230);
+				ctx.font = '20px Trebuchet MS';
+			}
+		}
+
+		if (songfound == true)
+		{
+			if (singlewin.length == 0)drawSingleLose();
+			else drawSingleWin();
+		}
 	}
 
 	if (gametype == "double")
