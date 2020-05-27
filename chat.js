@@ -20,6 +20,7 @@ var countdown = -1;
 var ready = false;
 
 var nbwin = 3;
+var defaultnbwin = 3;
 var singlewin = [];
 
 var doublewin = [[],[]];
@@ -285,7 +286,7 @@ ws.onmessage=function(event) {
 				{
 					nbwin = parseInt(songlist.find(x => x.listname === liste).nbwin);
 				}
-				else nbwin = 3;
+				else nbwin = defaultnbwin;
 
 				if (songlist.find(x => x.listname === liste).delay != undefined)
 				{
@@ -420,6 +421,8 @@ ws.onmessage=function(event) {
 				if (singlewin.length == 1)chat[chat.length -1].found = "🥈";
 				if (singlewin.length == 2)chat[chat.length -1].found = "🥉";
 				if (singlewin.length >= 3)chat[chat.length -1].found = "🍭";
+
+				ws.send("!say /timeout " + msg.user + " 1s Bonne réponse !");
 
 				if (singlewin.length < nbwin)
 				{
@@ -689,7 +692,11 @@ function drawSingleWin()
 		}
 		
 		ctx.fillText("La bonne réponse était", x/2 - 400 - ctx.measureText("La bonne réponse était").width/2, 230);
-		ctx.font = '30px Trebuchet MS';
+		ctx.font = '30px Trebuchet MS';	
+		if (ctx.measureText(fullsongname).width >= 770)
+		{
+			ctx.font = '25px Trebuchet MS';	
+		}
 		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 280);
 		ctx.font = '20px Trebuchet MS';
 
@@ -705,10 +712,14 @@ function drawSingleLose()
 		ctx.fillStyle = "white";
 		ctx.fillText("C'est pas grave, c'était dur !", x/2 - 400 - ctx.measureText("C'est pas grave, c'était dur !").width/2, 160);
 		ctx.fillText("La bonne réponse était", x/2 - 400 - ctx.measureText("La bonne réponse était").width/2, 200);
-		ctx.font = '30px Trebuchet MS';
-		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 270);
+		ctx.font = '30px Trebuchet MS';	
+		if (ctx.measureText(fullsongname).width >= 770)
+		{
+			ctx.font = '25px Trebuchet MS';	
+		}
+		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 280);
 		ctx.font = '20px Trebuchet MS';
-
+		
 		if (winImage != undefined && visiblewin)
 		{
 			drawWinImage();
@@ -763,6 +774,11 @@ function drawDoubleWin(info)
 			ctx.fillText(", ", x/2 - 400 - winnerswidth/2 + curposwin, 220 + info * 60);				
 			curposwin += ctx.measureText(", ").width;
 		}
+	}
+	
+	if (winImage != undefined && visiblewin)
+	{
+		drawWinImage();
 	}	
 }
 
@@ -847,10 +863,10 @@ function redraw()
 	{
 		if (songfound == false)
 		{
-			drawCadre("white");
-			console.log(singletext);
 			if (singletext != undefined)
 			{
+				drawCadre("white");
+				console.log(singletext);				
 				ctx.font = '40px Trebuchet MS';
 				ctx.fillStyle = 'white';
 				ctx.fillText(singletext, x/2 - 400 - ctx.measureText(singletext).width/2, 230);
@@ -1055,7 +1071,8 @@ function displayThemes()
 		ctx.strokeStyle="white";
 		ctx.fillStyle="black";
 
-		roundRect(ctx, x/2 - 400, 120, 380, 700, 20, true);
+		var fullheight = songlist.length*40+100;
+		roundRect(ctx, x/2 - 400, 120, 380, fullheight, 20, true);
 
 		ctx.font = '40px Trebuchet MS';
 		ctx.fillStyle="white";
