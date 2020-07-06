@@ -1,7 +1,7 @@
 /* eslint-disable no-redeclare */
-var ws = new WebSocket("ws://localhost:8100");
+var ws = new WebSocket("ws://192.168.1.13:8100");
 var x = 1900;
-var y = 900;
+var y = 920;
 
 var members = [{'user':'Personne','color':'#FF0000'},];
 
@@ -46,6 +46,7 @@ var visibletheme = false;
 var visibletotalpoints = false;
 var visiblevote = false;
 var visiblewin = false;
+var visiblemosaic = false;
 
 var canvas = document.getElementById("canvas");
 
@@ -131,6 +132,13 @@ ws.onmessage=function(event) {
 			ws.send("!say Petit rappel : On félicite les premiers, on ne les insulte pas ! (Même si vous vous connaissez !) Respect et bienveillance avant tout ! Merci");
 		}
 	}	
+	else if (msg.content == "!twitter")
+	{
+		if (msg.isBroadcaster == "true")
+		{
+			ws.send("!say Suivez moi sur Twitter pour ne pas louper les prochains blindtest ! https://twitter.com/AfkCafe");
+		}
+	}		
 	else if (msg.content == "!clearchat")
 	{
 		if (msg.isBroadcaster == "true")
@@ -272,7 +280,7 @@ ws.onmessage=function(event) {
 			else
 			{
 				liste = songlist[parseInt(msg.content.replace("!start ", ""))].listname
-
+				singletext = "On va commencer !";
 				points = [];
 				numberfound = 0;
 				songindex = -1;
@@ -303,6 +311,11 @@ ws.onmessage=function(event) {
 				{				
 					gametype = "multi";				
 				}
+
+				if (songlist.find(x => x.listname === liste).type == 'mosaic')
+				{				
+					gametype = "mosaic";				
+				}				
 				
 				if (songlist.find(x => x.listname === liste).type == 'double')
 				{				
@@ -413,7 +426,7 @@ ws.onmessage=function(event) {
 			if (singlewin.find(x => x.user === msg.user)!=undefined)
 			{
 				// UNCOMMENT
-				//ok = false;
+				ok = false;
 			}
 			if (ok)
 			{
@@ -421,8 +434,6 @@ ws.onmessage=function(event) {
 				if (singlewin.length == 1)chat[chat.length -1].found = "🥈";
 				if (singlewin.length == 2)chat[chat.length -1].found = "🥉";
 				if (singlewin.length >= 3)chat[chat.length -1].found = "🍭";
-
-				ws.send("!say /timeout " + msg.user + " 1s Bonne réponse !");
 
 				if (singlewin.length < nbwin)
 				{
@@ -471,7 +482,7 @@ ws.onmessage=function(event) {
 				if (doublewin[i].find(x => x.user === msg.user)!=undefined)
 				{
 					// UNCOMMENT
-					//ok = false;
+					ok = false;
 				}
 				if (ok)
 				{			
@@ -586,7 +597,7 @@ ws.onmessage=function(event) {
 
 		drawMultiTags();
 		drawMultiSongs();			
-	}	
+	}
 	else if (gametype == 'vote')
 	{		
 		var v = parseInt(msg.content);
@@ -609,6 +620,17 @@ ws.onmessage=function(event) {
 			else addChat(msg.user, msg.content, "", "no");
 		}
 		else addChat(msg.user, msg.content, "", "no");
+	}
+	else if (gametype == "mosaic")
+	{
+		addChat(msg.user, msg.content, "", "no");
+		drawTitle();	
+
+		if (songindex >= 0)
+		{
+			fillMosaic();
+
+		}
 	}
 	else addChat(msg.user, msg.content, "", "no");
 
@@ -914,6 +936,12 @@ function redraw()
 		drawMultiSongs();
 	}
 
+	if (gametype == "mosaic")
+	{
+
+		drawMosaic();
+	}
+
 	drawChat();
 	drawTitle();
 
@@ -930,7 +958,7 @@ function redraw()
 	if (visiblevote)
 	{
 		displayVote();		
-	}		
+	}
 }
 
 function addPoints(amount, user)
@@ -1064,6 +1092,34 @@ function displayPoints()
 	}
 }
 
+function drawMosaic()
+{
+	ctx.strokeStyle="white";
+	ctx.fillstyle="black";
+	roundRect(ctx, x/2 - 780, 128, 760, 760);
+	for (var i = 0; i < 3; i++) {
+		ctx.fillRect(x/2 - 780, 298 + i*190, 760, 4);
+		ctx.fillRect(x/2 - 780 + 198 + i*190, 128, 4, 760);
+	}
+}
+
+function fillMosaic()
+{
+	for (var i = 0; i < 16; i++) {
+		var img = new Image();   // Crée un nouvel élément Image
+		img.src = "./images/mosaic/"+i+".jpg"; // Définit le chemin vers sa source
+		var x0 = x/2 - 780;
+		var y0 = 128;
+
+		//img.onload = function() {
+			ctx.drawImage(img, x0 + i%4 * 190, y0+Math.trunc(i/4) * 190);
+			console.log(i);
+			console.log(Math.trunc(i/4) * 190);
+			ctx.drawImage(img, x0, y0);
+		//}
+	}
+}
+
 function displayThemes()
 {
 	if (visibletheme == true)
@@ -1076,7 +1132,7 @@ function displayThemes()
 
 		ctx.font = '40px Trebuchet MS';
 		ctx.fillStyle="white";
-		ctx.fillText("Thèmes", x/2 - 200 - ctx.measureText("Thèmes").width/2, y/2 - 270);
+		ctx.fillText("Thèmes", x/2 - 205 - ctx.measureText("Thèmes").width/2, y/2 - 270);
 		ctx.font = '20px Trebuchet MS';
 		for (var i = 0; i <= songlist.length - 1; i++) {
 			
@@ -1086,13 +1142,13 @@ function displayThemes()
 			if (done == true)
 			{
 				ctx.fillStyle="grey";
-				ctx.fillRect(x/2 - 200 - ctx.measureText(the).width/2 - 20, y/2 - 220 + i*40 - 8, ctx.measureText(the).width + 40, 3);
+				ctx.fillRect(x/2 - 205 - ctx.measureText(the).width/2 - 20, y/2 - 220 + i*40 - 8, ctx.measureText(the).width + 40, 3);
 			}
 			else
 			{
 				ctx.fillStyle="white";
 			}
-			ctx.fillText(i + " - " + the , x/2 - 200 - ctx.measureText(i + " - " + the).width/2, y/2 - 220 + i*40);
+			ctx.fillText(i + " - " + the , x/2 - 205 - ctx.measureText(i + " - " + the).width/2, y/2 - 220 + i*40);
 		}
 		ctx.fillStyle="white";
 	}
@@ -1255,6 +1311,7 @@ function resetvisibles()
 	visibletheme = false;
 	visiblevote = false;
 	visiblewin = false;
+	visiblemosaic = false;
 }
 
 /**
