@@ -11,8 +11,9 @@ var totalpoints = [];
 var voteprop = [];
 var votes = [];
 
-var chat = [];
+var mosaic = [];
 
+var chat = [];
 
 var defaultdelay = 700;
 var delay = 0;
@@ -314,7 +315,8 @@ ws.onmessage=function(event) {
 
 				if (songlist.find(x => x.listname === liste).type == 'mosaic')
 				{				
-					gametype = "mosaic";				
+					gametype = "mosaic";
+					preloadMosaic(songlist.find(x => x.listname === liste).songs.length);	
 				}				
 				
 				if (songlist.find(x => x.listname === liste).type == 'double')
@@ -621,15 +623,15 @@ ws.onmessage=function(event) {
 		}
 		else addChat(msg.user, msg.content, "", "no");
 	}
-	else if (gametype == "mosaic")
+	else if (gametype == 'mosaic')
 	{
 		addChat(msg.user, msg.content, "", "no");
 		drawTitle();	
+		console.log("mosaic");
 
 		if (songindex >= 0)
 		{
 			fillMosaic();
-
 		}
 	}
 	else addChat(msg.user, msg.content, "", "no");
@@ -1098,25 +1100,32 @@ function drawMosaic()
 	ctx.fillstyle="black";
 	roundRect(ctx, x/2 - 780, 128, 760, 760);
 	for (var i = 0; i < 3; i++) {
-		ctx.fillRect(x/2 - 780, 298 + i*190, 760, 4);
-		ctx.fillRect(x/2 - 780 + 198 + i*190, 128, 4, 760);
+		ctx.fillRect(x/2 - 780, 316 + i*190, 760, 4);
+		ctx.fillRect(x/2 - 780 + 188 + i*190, 128, 4, 760);
+	}
+}
+
+function preloadMosaic(length)
+{
+	for (var i = 0; i < length; i++) {
+		mosaic[i] = new Image();   // Crée un nouvel élément Image
+		mosaic[i].src = "./images/mosaic/"+i+".jpg"; // Définit le chemin vers sa source
+
+		mosaic[i].onload = function() {
+				console.log("Image " + i + " chargée");
+			}
 	}
 }
 
 function fillMosaic()
 {
 	for (var i = 0; i < 16; i++) {
-		var img = new Image();   // Crée un nouvel élément Image
-		img.src = "./images/mosaic/"+i+".jpg"; // Définit le chemin vers sa source
 		var x0 = x/2 - 780;
 		var y0 = 128;
 
-		//img.onload = function() {
-			ctx.drawImage(img, x0 + i%4 * 190, y0+Math.trunc(i/4) * 190);
-			console.log(i);
-			console.log(Math.trunc(i/4) * 190);
-			ctx.drawImage(img, x0, y0);
-		//}
+		ctx.drawImage(mosaic[i], x0 + i%4 * 190, y0+Math.trunc(i/4) * 190);
+
+		drawMosaic();
 	}
 }
 
