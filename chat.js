@@ -11,7 +11,16 @@ var totalpoints = [];
 var voteprop = [];
 var votes = [];
 
-var mosaic = [];
+var mosaicpics = [];
+var blankpic = [];
+var coverpic = [];
+var curmosaic = [];
+var tbfmosaic = [];
+var foundmosaic = [];
+var cdmosaic = -1;
+var defaultcdmosaic = 200;
+var lastuserfound = [];
+var lastsongfound = [];
 
 var chat = [];
 
@@ -47,7 +56,6 @@ var visibletheme = false;
 var visibletotalpoints = false;
 var visiblevote = false;
 var visiblewin = false;
-var visiblemosaic = false;
 
 var canvas = document.getElementById("canvas");
 
@@ -232,6 +240,11 @@ ws.onmessage=function(event) {
 				info1found = false;
 				info2found = false;
 			}
+
+			if (gametype == "mosaic")
+			{
+				cdmosaic = defaultcdmosaic;
+			}			
 		}
 	}	
 	else if (msg.content.startsWith("!save"))
@@ -316,7 +329,14 @@ ws.onmessage=function(event) {
 				if (songlist.find(x => x.listname === liste).type == 'mosaic')
 				{				
 					gametype = "mosaic";
-					preloadMosaic(songlist.find(x => x.listname === liste).songs.length);	
+					foundmosaic = [];
+					tbfmosaic = Array.from(songlist.find(x => x.listname === liste).songs);
+					curmosaic = Array.from(tbfmosaic);
+					
+					curmosaic.splice(9,tbfmosaic.length-9);
+					tbfmosaic.splice(0,9);
+
+					preloadMosaic(songlist.find(x => x.listname === liste).songs.length);
 				}				
 				
 				if (songlist.find(x => x.listname === liste).type == 'double')
@@ -631,7 +651,57 @@ ws.onmessage=function(event) {
 
 		if (songindex >= 0)
 		{
-			fillMosaic();
+			for (var i = 0; i < curmosaic.length; i++){
+				var inf = curmosaic[i].name;
+				var alt = curmosaic[i].alternate;
+				var found = curmosaic[i].found;
+				var ok = false;
+				
+				if (similarity(msg.content, inf) > 0.75)
+				{
+					ok = true;
+				}
+				if (alt != '' && similarity(msg.content, alt) > 0.75)
+				{
+					ok = true;
+				}
+				if (found != 'false')
+				{
+					ok = false;
+				}
+				if (ok)
+				{			
+					chat[chat.length - 1].found = "🏅";
+					curmosaic[i].found = msg.user;
+					lastuserfound[i] = msg.user;
+					lastsongfound[i] = curmosaic[i].name;
+					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 1 point de plus pour toi TakeNRG" );
+					addPoints(1, msg.user);
+					numberfound++;
+					
+					foundmosaic.push(curmosaic[i]);
+
+					if (tbfmosaic.length > 0)
+					{
+						curmosaic[i] = tbfmosaic[0];
+						tbfmosaic.splice(0,1);
+					}
+					else
+					{
+						curmosaic[i].index = -1
+					}
+				}
+			}
+		}
+
+		if (numberfound == mosaicpics.length)
+		{
+			if (songfound == false)
+			{
+				ws.send("!say Bravo, vous avez tout trouvé !" );
+			}
+
+			songfound = true;
 		}
 	}
 	else addChat(msg.user, msg.content, "", "no");
@@ -881,6 +951,7 @@ function drawMultiSongs()
 
 function redraw()
 {
+
 	ctx.clearRect(0,0,x,y);
 
 	if (gametype == "single")
@@ -938,10 +1009,16 @@ function redraw()
 		drawMultiSongs();
 	}
 
-	if (gametype == "mosaic")
-	{
-
-		drawMosaic();
+	if (gametype == 'mosaic')
+	{	
+		if (songindex < 0)
+		{
+			drawMosaic();
+		}
+		else
+		{
+			fillMosaic();
+		}
 	}
 
 	drawChat();
@@ -998,7 +1075,7 @@ function addPoints(amount, user)
 		}
 	}
 
-	if (liste != "exemple")
+	if (liste != "exemple" && liste != "mosaicexemple")
 	{
 		if (totalpoints.find(x => x.user === user) != undefined)
 		{
@@ -1098,33 +1175,81 @@ function drawMosaic()
 {
 	ctx.strokeStyle="white";
 	ctx.fillstyle="black";
-	roundRect(ctx, x/2 - 780, 128, 760, 760);
-	for (var i = 0; i < 3; i++) {
-		ctx.fillRect(x/2 - 780, 316 + i*190, 760, 4);
-		ctx.fillRect(x/2 - 780 + 188 + i*190, 128, 4, 760);
+	roundRect(ctx, x/2 - 780, 135, 750, 750);
+	for (var i = 0; i < 2; i++) {
+		ctx.fillRect(x/2 - 780, 135 + 248 + i*250, 750, 4);
+		ctx.fillRect(x/2 - 780 + 248 + i*250, 135, 4, 750);
 	}
 }
 
 function preloadMosaic(length)
 {
 	for (var i = 0; i < length; i++) {
-		mosaic[i] = new Image();   // Crée un nouvel élément Image
-		mosaic[i].src = "./images/mosaic/"+i+".jpg"; // Définit le chemin vers sa source
-
-		mosaic[i].onload = function() {
-				console.log("Image " + i + " chargée");
-			}
+		mosaicpics[i] = new Image();   // Crée un nouvel élément Image
+		mosaicpics[i].src = "./images/"+liste+"/"+i+".jpg"; // Définit le chemin vers sa source
 	}
+
+	blankpic = new Image();
+	blankpic.src = "./mosaic/blank.jpg";
+
+	for (var i = 0; i < 15; i++){
+		coverpic[i] = new Image();
+		coverpic[i].src = "./mosaic/cover"+i+".png";
+	}
+	
+	for (var i = 0; i < 9; i++){
+		curmosaic[i].cover = coverpic.length - 1;
+	}
+
 }
 
 function fillMosaic()
 {
-	for (var i = 0; i < 16; i++) {
+	for (var i = 0; i < 9; i++) {
 		var x0 = x/2 - 780;
-		var y0 = 128;
+		var y0 = 135;
 
-		ctx.drawImage(mosaic[i], x0 + i%4 * 190, y0+Math.trunc(i/4) * 190);
+		if (curmosaic[i].index == -1)
+		{
+			ctx.drawImage(blankpic, x0 + i%3 * 250, y0+Math.trunc(i/3) * 250, 250, 250);
+		}
+		else
+		{
+			ctx.drawImage(mosaicpics[curmosaic[i].index], x0 + i%3 * 250, y0+Math.trunc(i/3) * 250, 250, 250);
+			ctx.drawImage(coverpic[curmosaic[i].cover], x0 + i%3 * 250, y0+Math.trunc(i/3) * 250, 250, 250);
+		}
 
+		
+		if (curmosaic[i].cover < 2 || curmosaic[i].index == -1)
+		{
+			ctx.fillStyle="green";
+			ctx.font = '30px Trebuchet MS';
+
+			var fontsize = 30;
+			while (ctx.measureText(lastsongfound[i]).width > 250)
+			{
+				fontsize = fontsize - 2;
+				ctx.font = fontsize.toString() +"px Trebuchet MS";
+			}
+			ctx.fillText(lastsongfound[i], x0 + i%3 * 250 + 250/2 - ctx.measureText(lastsongfound[i]).width/2, y0+Math.trunc(i/3) * 250 + 60);
+			
+			ctx.fillStyle="white";
+			ctx.font = '30px Trebuchet MS';
+			ctx.fillText("GG", x0 + i%3 * 250 + 250/2 - ctx.measureText("GG").width/2, y0+Math.trunc(i/3) * 250 + 110);
+
+			fontsize = 30;
+			while (ctx.measureText(lastuserfound[i]).width > 250)
+			{
+				fontsize = fontsize - 2;
+				ctx.font = fontsize.toString() +"px Trebuchet MS";
+			}
+			ctx.fillText(lastuserfound[i], x0 + i%3 * 250 + 250/2 - ctx.measureText(lastuserfound[i]).width/2, y0+Math.trunc(i/3) * 250 + 140);
+
+
+			ctx.font = '30px Trebuchet MS';
+			ctx.fillText("🔥", x0 + i%3 * 250 + 250/2 - ctx.measureText("🔥").width/2, y0+Math.trunc(i/3) * 250 + 180);
+			ctx.font = '20px Trebuchet MS';
+		}		
 		drawMosaic();
 	}
 }
@@ -1320,7 +1445,6 @@ function resetvisibles()
 	visibletheme = false;
 	visiblevote = false;
 	visiblewin = false;
-	visiblemosaic = false;
 }
 
 /**
@@ -1393,4 +1517,23 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 		ws.send("!say GO !");
 		ready = true;
 	}
+
+	if (gametype == "mosaic")
+	{
+		cdmosaic--;
+		if (cdmosaic == 0)
+		{
+			cdmosaic = defaultcdmosaic;
+			redraw();
+			
+			for (var i = 0; i < curmosaic.length; i++)
+			{
+				if (curmosaic[i].cover < 14)
+				{
+					curmosaic[i].cover++
+				}
+			}
+		}
+	}
+
   }, 10);

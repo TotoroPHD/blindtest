@@ -34,6 +34,7 @@ ws.on('connection', function (ws) {
    
   client.on('chat', (channel, user, message, isSelf) => {
     if (isSelf) return;
+    message = message.replace(/"/g,"''");
     if (message.length > 100)
     {
      message = message.substring(0, 100) + "...";   
