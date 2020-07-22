@@ -41,6 +41,8 @@ var songfound = false;
 var info1found = false;
 var info2found = false;
 
+var wargames = [[],[]];
+
 var songindex = 0;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
 var youtube;
@@ -204,7 +206,7 @@ ws.onmessage=function(event) {
 	{
 		if (msg.isBroadcaster == "true" && songindex < songlist.find(x => x.listname === liste).songs.length - 1)
 		{
-			if (gametype == "single" || gametype == "double")
+			if (gametype == "single" || gametype == "double" || gametype == "wargames")
 			{
 				countdown = delay;
 				if (countdown > 0)
@@ -225,7 +227,7 @@ ws.onmessage=function(event) {
 			winImage = "./images/"+liste+"/"+songindex+".jpg";
 			youtube = songlist.find(x => x.listname === liste).songs[songindex].youtube;
 
-			if (gametype == "single")
+			if (gametype == "single" || gametype == "wargames")
 			{
 				singlewin = [];
 				song = songlist.find(x => x.listname === liste).songs[songindex].name;
@@ -332,6 +334,7 @@ ws.onmessage=function(event) {
 					foundmosaic = [];
 					tbfmosaic = Array.from(songlist.find(x => x.listname === liste).songs);
 					curmosaic = Array.from(tbfmosaic);
+					foundmosaic = [];
 					
 					curmosaic.splice(9,tbfmosaic.length-9);
 					tbfmosaic.splice(0,9);
@@ -344,7 +347,12 @@ ws.onmessage=function(event) {
 					gametype = "double";		
 					info1found = false;
 					info2found = false;		
-				}				
+				}	
+				if (songlist.find(x => x.listname === liste).type == 'wargames')
+				{				
+					gametype = "wargames";		
+					preloadWargames(songlist.find(x => x.listname === liste).songs.length);
+				}								
 			}
 		}
 	}	
@@ -360,7 +368,7 @@ ws.onmessage=function(event) {
 
 			for (var i = 0; i < chat.length; i++)chat[i].cur="no";
 
-			if (gametype == "single")
+			if (gametype == "single" || gametype == "wargames")
 			{
 				if (singlewin.length == 0)
 				{
@@ -430,12 +438,26 @@ ws.onmessage=function(event) {
 			votes = [];
 		}
 	}		
-	else if (gametype == "single" && ready == true)
+	else if ((gametype == "single" && ready == true) || (gametype == "wargames" && ready == true))
 	{
 		addChat(msg.user, msg.content, "", "yes");
 
 		if (songfound == false)
 		{
+			if(gametype == "wargames" && msg.content.startsWith('!'))
+			{
+				if(!isNaN(parseInt(msg.content.replace('!', ''))))
+				{
+					console.log("on a un extrait à jouer ! on check le nom");
+					var sample = parseInt(msg.content.replace('!', ''));
+					if(sample >= 0 && (sample <= songlist.find(x => x.listname === liste).songs[songindex].samples))
+						{
+							console.log("Le nom est bon ! on joue !");
+							wargames[songindex][sample].play();
+						}
+				}
+			}
+
 			var ok = false;
 			if (similarity(msg.content, song) > 0.75)
 			{
@@ -734,7 +756,7 @@ function drawTitle()
 	ctx.font = '20px Trebuchet MS';
 	ctx.fillText(subtitle, x/2 - ctx.measureText(subtitle).width/2, 80);
 
-	if (gametype == 'single' || gametype == 'double')
+	if (gametype == 'single' || gametype == 'double' || gametype == 'wargames')
 	{
 		ctx.font = '40px Trebuchet MS';
 		var tot = songlist.find(x => x.listname === liste).songs.length;
@@ -954,7 +976,7 @@ function redraw()
 
 	ctx.clearRect(0,0,x,y);
 
-	if (gametype == "single")
+	if (gametype == "single" || gametype == "wargames")
 	{
 		if (songfound == false)
 		{
@@ -1201,6 +1223,23 @@ function preloadMosaic(length)
 		curmosaic[i].cover = coverpic.length - 1;
 	}
 
+}
+
+function preloadWargames(length)
+{
+
+	//ffmpeg -i test.mp3 -f segment -segment_time 1 -c copy %01d.mp3
+	//find . -name '*.mp3' -exec ffmpeg -y -i {} -af "afade=t=in:st=0:d=0.1" -hide_banner -loglevel panic {} \;
+
+	songlist.find(x => x.listname === liste).songs.length
+	
+	for (var i = 0; i < length; i++) {
+		for (var j = 0; j < songlist.find(x => x.listname === liste).songs[i].samples; j++)
+			{
+				wargames[i][j] = new Audio();
+				wargames[i][j].src = "./wargames/"+liste+"/"+i+"/"+j+".mp3";
+			}		
+	}
 }
 
 function fillMosaic()
