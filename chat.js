@@ -24,6 +24,10 @@ var lastsongfound = [];
 
 var chat = [];
 
+var cdwargames = -1;
+var wargamesusers = [];
+var wargames = [[],[]];
+
 var defaultdelay = 700;
 var delay = 0;
 var countdown = -1;
@@ -40,8 +44,6 @@ var numberfound = 0;
 var songfound = false;
 var info1found = false;
 var info2found = false;
-
-var wargames = [[],[]];
 
 var songindex = 0;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
@@ -234,6 +236,10 @@ ws.onmessage=function(event) {
 				alternate = songlist.find(x => x.listname === liste).songs[songindex].alternate;
 				fullsongname = songlist.find(x => x.listname === liste).songs[songindex].fullname;
 				singletext = songlist.find(x => x.listname === liste).songs[songindex].singletext;
+				if (gametype == "wargames")
+				{
+					singletext = "L'extrait fait " + songlist.find(x => x.listname === liste).songs[songindex].samples + " secondes";
+				}
 			}
 			
 			if (gametype == "double")
@@ -246,7 +252,12 @@ ws.onmessage=function(event) {
 			if (gametype == "mosaic")
 			{
 				cdmosaic = defaultcdmosaic;
-			}			
+			}
+
+			if (gametype == "wargames")
+			{
+				wargamesusers = [];
+			}
 		}
 	}	
 	else if (msg.content.startsWith("!save"))
@@ -350,6 +361,7 @@ ws.onmessage=function(event) {
 				}	
 				if (songlist.find(x => x.listname === liste).type == 'wargames')
 				{				
+					cdwargames = 100;
 					gametype = "wargames";		
 					preloadWargames(songlist.find(x => x.listname === liste).songs.length);
 				}								
@@ -444,19 +456,42 @@ ws.onmessage=function(event) {
 
 		if (songfound == false)
 		{
+			if (gametype == "wargames" && wargamesusers.find(x => x.user === msg.user) != undefined && !msg.content.startsWith('!'))
+			{
+				if (wargamesusers.find(x => x.user === msg.user).token > 0 && wargamesusers.find(x => x.user === msg.user).mute == 0)
+				{
+					wargamesusers.find(x => x.user === msg.user).token = wargamesusers.find(x => x.user === msg.user).token - 1;
+					ws.send("!say " + msg.user + " : Un token en moins pour toi ! Il t'en reste " + wargamesusers.find(x => x.user === msg.user).token);
+				}
+			}
+
 			if(gametype == "wargames" && msg.content.startsWith('!'))
 			{
 				if(!isNaN(parseInt(msg.content.replace('!', ''))))
 				{
-					console.log("on a un extrait à jouer ! on check le nom");
 					var sample = parseInt(msg.content.replace('!', ''));
 					if(sample >= 0 && (sample <= songlist.find(x => x.listname === liste).songs[songindex].samples))
+					{
+						if (wargamesusers.find(x => x.user === msg.user) != undefined)
 						{
-							console.log("Le nom est bon ! on joue !");
-							wargames[songindex][sample].play();
+							if (wargamesusers.find(x => x.user === msg.user).mute == 0)
+							{							
+								wargamesusers.find(x => x.user === msg.user).token = wargamesusers.find(x => x.user === msg.user).token + 1;
+								ws.send("!say " + msg.user + " : Un token en plus pour toi ! Tu en as " + wargamesusers.find(x => x.user === msg.user).token);
+								wargamesusers.find(x => x.user === msg.user).mute = 4;
+								wargames[songindex][sample].play();
+							}
 						}
+						else 
+						{
+							wargamesusers.push({'user':msg.user,'token':1, 'mute':4});
+							ws.send("!say " + msg.user + " : Un token en plus pour toi ! Tu en as " + wargamesusers.find(x => x.user === msg.user).token);
+							wargames[songindex][sample].play();						
+						}		
+					}
 				}
 			}
+
 
 			var ok = false;
 			if (similarity(msg.content, song) > 0.75)
@@ -472,6 +507,20 @@ ws.onmessage=function(event) {
 				// UNCOMMENT
 				ok = false;
 			}
+			if (gametype == "wargames" && wargamesusers.find(x => x.user === msg.user).token == 0)
+			{
+				ws.send("!say " + msg.user + " : Plus de réponse possible !");		
+				ok = false;
+			}
+			if (gametype == "wargames" && wargamesusers.find(x => x.user === msg.user).mute > 0)
+			{
+				ws.send("!say " + msg.user + " : Attends encore " + wargamesusers.find(x => x.user === msg.user).mute + " seconde(s) pour répondre !");		
+				ok = false;
+			}
+			if (gametype == "wargames" && msg.content.startsWith('!'))
+			{
+				ok = false;
+			}			
 			if (ok)
 			{
 				if (singlewin.length == 0)chat[chat.length -1].found = "🥇";
@@ -499,7 +548,7 @@ ws.onmessage=function(event) {
 
 					if (youtube != undefined)
 					{
-						ws.send("!say Pour réécouter tranquillement : " + youtube);  
+						ws.send("!say Pour réécouter tranquillement : " + youtube);
 					}					
 				}
 			}
@@ -697,7 +746,7 @@ ws.onmessage=function(event) {
 					curmosaic[i].found = msg.user;
 					lastuserfound[i] = msg.user;
 					lastsongfound[i] = curmosaic[i].name;
-					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 1 point de plus pour toi TakeNRG" );
+					ws.send("!say 👏" + curmosaic[i].fullname + "👏 a été trouvé par " + msg.user);
 					addPoints(1, msg.user);
 					numberfound++;
 					
@@ -1231,10 +1280,8 @@ function preloadWargames(length)
 	//ffmpeg -i test.mp3 -f segment -segment_time 1 -c copy %01d.mp3
 	//find . -name '*.mp3' -exec ffmpeg -y -i {} -af "afade=t=in:st=0:d=0.1" -hide_banner -loglevel panic {} \;
 
-	songlist.find(x => x.listname === liste).songs.length
-	
 	for (var i = 0; i < length; i++) {
-		for (var j = 0; j < songlist.find(x => x.listname === liste).songs[i].samples; j++)
+		for (var j = 0; j <= songlist.find(x => x.listname === liste).songs[i].samples; j++)
 			{
 				wargames[i][j] = new Audio();
 				wargames[i][j].src = "./wargames/"+liste+"/"+i+"/"+j+".mp3";
@@ -1265,7 +1312,7 @@ function fillMosaic()
 			ctx.font = '30px Trebuchet MS';
 
 			var fontsize = 30;
-			while (ctx.measureText(lastsongfound[i]).width > 250)
+			while (ctx.measureText(lastsongfound[i]).width > 240)
 			{
 				fontsize = fontsize - 2;
 				ctx.font = fontsize.toString() +"px Trebuchet MS";
@@ -1277,7 +1324,7 @@ function fillMosaic()
 			ctx.fillText("GG", x0 + i%3 * 250 + 250/2 - ctx.measureText("GG").width/2, y0+Math.trunc(i/3) * 250 + 110);
 
 			fontsize = 30;
-			while (ctx.measureText(lastuserfound[i]).width > 250)
+			while (ctx.measureText(lastuserfound[i]).width > 240)
 			{
 				fontsize = fontsize - 2;
 				ctx.font = fontsize.toString() +"px Trebuchet MS";
@@ -1573,6 +1620,27 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 				}
 			}
 		}
+	}
+
+	if (gametype == "wargames")
+	{
+		if (cdwargames == 0)
+		{
+			cdwargames = 100;
+			for (var i = 0; i < wargamesusers.length; i++)
+			{
+				if (wargamesusers[i].mute > 0)
+				{
+					wargamesusers[i].mute -= 1;
+					if (wargamesusers[i].mute == 0)
+					{
+						ws.send("!say " + wargamesusers[i].user + ", tu peux à nouveau proposer une réponse !");
+					}
+				}
+
+			}
+		}
+		cdwargames--;
 	}
 
   }, 10);
