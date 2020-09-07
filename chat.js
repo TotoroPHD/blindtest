@@ -4,6 +4,7 @@ var x = 1900;
 var y = 920;
 
 var members = [{'user':'Personne','color':'#FF0000'},];
+var instruments = ['Batterie', 'Basse', 'Guitare', 'Voix'];
 
 var points = [];
 var totalpoints = [];
@@ -232,6 +233,10 @@ ws.onmessage=function(event) {
 				alternate = songlist.find(x => x.listname === liste).songs[songindex].alternate;
 				fullsongname = songlist.find(x => x.listname === liste).songs[songindex].fullname;
 				singletext = songlist.find(x => x.listname === liste).songs[songindex].singletext;
+				if (singletext == undefined)
+				{
+					singletext = "C'est parti pour la chanson " + (songindex+1);
+				}
 			}
 			
 			if (gametype == "double")
@@ -474,7 +479,7 @@ ws.onmessage=function(event) {
 					songfound = true;
 
 					countdown = -1;
-					ready = false;
+					//ready = false;
 
 					drawSingleWin();
 					givePoints(singlewin);
@@ -485,6 +490,42 @@ ws.onmessage=function(event) {
 					{
 						ws.send("!say Pour réécouter tranquillement : " + youtube);
 					}					
+				}
+			}
+		}
+
+		if (numberfound < 4 && gametype == "quiz")
+		{
+			for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].quiz.length; i++){
+				var lev = 0.75;
+				if (songlist.find(x => x.listname === liste).songs[songindex].quiz[i].lev != undefined)
+					lev = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].lev
+
+				var inf = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].answer;
+				var alt = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].alternate;
+				var found = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found;
+				var ok = false;
+				
+				if (similarity(msg.content, inf) >= lev)
+				{
+					ok = true;
+				}
+				if (alt != '' && similarity(msg.content, alt) >= lev)
+				{
+					ok = true;
+				}
+				if (found != 'false')
+				{
+					ok = false;
+				}
+				if (ok)
+				{			
+					chat[chat.length - 1].found = "🏅";
+					songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found = msg.user;
+
+					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 1 point de plus pour toi TakeNRG");
+					addPoints(pts, msg.user);
+					numberfound++;		
 				}
 			}
 		}
@@ -749,11 +790,11 @@ function drawTitle()
 	}	
 }
 
-function drawCadre(color)
+function drawCadre(color, height=200, offset=0)
 {
 		ctx.strokeStyle=color;
 		ctx.fillStyle=bg;
-		roundRect(ctx, x/2 - 800, 120, 780, 200, 20, true );
+		roundRect(ctx, x/2 - 800, 120 + offset, 780, height, 20, true );
 }
 
 function drawSingleWin()
@@ -904,8 +945,15 @@ function drawWinImage()
 	var img = new Image();   // Crée un nouvel élément Image
 	img.src = winImage; // Définit le chemin vers sa source
 	img.onload = function() {
+
 		var hRatio = 380/img.width;
 		var vRatio = 555/img.height;
+		
+		if (gametype == 'quiz')
+		{
+			var vRatio = 380/img.height;			
+		}
+		
 		var ratio  = Math.min ( hRatio, vRatio );
 
 		var xoffset = 0;
@@ -918,10 +966,27 @@ function drawWinImage()
 		{
 			xoffset = Math.round((380 - img.width*ratio)/2);
 		}
+
+		if (gametype == 'quiz')
+		{
+			xoffset = Math.round((380 - img.width*ratio)/2);
+		}
+
 		ctx.fillStyle='white';
 		ctx.strokeStyle='white';
-		ctx.drawImage(img, 0,0, img.width, img.height, x/2 - 400 + xoffset, 340 + yoffset, img.width*ratio, img.height*ratio);
-		roundRect(ctx,x/2-400, 340, 380,555,5,false);
+		
+		if (gametype == 'quiz')
+		{
+			ctx.drawImage(img, 0,0, img.width, img.height, x/2 - 400 + xoffset, 515 + yoffset, img.width*ratio, img.height*ratio);
+			roundRect(ctx,x/2-400, 515, 380,380,5,false);
+		}
+		else
+		{
+			ctx.drawImage(img, 0,0, img.width, img.height, x/2 - 400 + xoffset, 340 + yoffset, img.width*ratio, img.height*ratio);
+			roundRect(ctx,x/2-400, 340, 380,555,5,false);
+		}
+		
+		
 	}
 }
 
@@ -955,6 +1020,56 @@ function drawMultiSongs()
 	ctx.font = '20px Trebuchet MS';
 }
 
+function drawQuiz()
+{
+	drawCadre("white", 160, 218);
+
+	if (visiblewin == false)
+	{
+		roundRect(ctx,x/2-400, 515, 380,380,20,false);
+		ctx.font = '28px Trebuchet MS';
+		ctx.fillStyle = 'white';			
+		ctx.fillText("Instruments débloqués : ", x/2 - 400 + 380/2 - ctx.measureText("Instruments débloqués :").width/2, 560);
+	}
+
+	for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].quiz.length; i++)
+	{
+		var question = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].question;
+		var found = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found;
+		var summary = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].summary;
+		var answer = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].answer;
+
+		ctx.font = '20px Trebuchet MS';
+		ctx.fillStyle = 'white';
+		if (found == 'false')
+		{
+			ctx.fillText(question, x/2 - 750, 380 + 30*i);
+		}
+		else
+		{
+			ctx.fillText(summary, x/2 - 750, 380 + 30*i);
+			ctx.fillText(" : " + answer, x/2 - 750 + ctx.measureText(summary).width, 380 + 30*i);
+			ctx.fillStyle = getUserColor(found);
+			ctx.fillText(" - " + found, x/2 - 750 + ctx.measureText(summary + " : " + answer).width, 380 + 30*i);
+		}
+
+		ctx.font = '40px Trebuchet MS';
+		if (visiblewin == false)
+		{
+			if ((numberfound - i) > 0)
+			{
+				ctx.fillStyle = 'white';
+			}
+			else
+			{
+				ctx.fillStyle = '#4e4e4e';
+			}
+			ctx.fillText(instruments[i], x/2 - 390 + 95 + i%2 * 190 - ctx.measureText(instruments[i]).width/2, 650 + Math.trunc(i/2) * 190);
+		}
+		ctx.font = '20px Trebuchet MS';
+	}
+}
+
 function redraw()
 {
 
@@ -962,11 +1077,11 @@ function redraw()
 
 	if (gametype == "single" || gametype == "quiz")
 	{
+		drawCadre("white");
 		if (songfound == false)
 		{
 			if (singletext != undefined)
 			{
-				drawCadre("white");
 				console.log(singletext);				
 				ctx.font = '40px Trebuchet MS';
 				ctx.fillStyle = 'white';
@@ -979,6 +1094,11 @@ function redraw()
 		{
 			if (singlewin.length == 0)drawSingleLose();
 			else drawSingleWin();
+		}
+
+		if (gametype == "quiz" && songindex >= 0)
+		{
+			drawQuiz();
 		}
 	}
 
