@@ -520,7 +520,8 @@ ws.onmessage=function(event) {
 				}
 				if (ok)
 				{			
-					chat[chat.length - 1].found = "🏅";
+					chat[chat.length - 1].found = "⭐";
+					chat[chat.length - 1].cur = "no";
 					songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found = msg.user;
 
 					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 1 point de plus pour toi TakeNRG");
@@ -960,14 +961,16 @@ function drawWinImage()
 		var yoffset = 0;
 		if (ratio == hRatio)
 		{
-			yoffset = Math.round((555 - img.height*ratio)/2);
+			if (gametype == 'quiz')
+			{
+				yoffset = Math.round((380 - img.height*ratio)/2);
+			}
+			else
+			{
+				yoffset = Math.round((555 - img.height*ratio)/2);
+			}
 		}
 		else
-		{
-			xoffset = Math.round((380 - img.width*ratio)/2);
-		}
-
-		if (gametype == 'quiz')
 		{
 			xoffset = Math.round((380 - img.width*ratio)/2);
 		}
@@ -1036,21 +1039,40 @@ function drawQuiz()
 	{
 		var question = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].question;
 		var found = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found;
-		var summary = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].summary;
 		var answer = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].answer;
 
 		ctx.font = '20px Trebuchet MS';
 		ctx.fillStyle = 'white';
 		if (found == 'false')
 		{
-			ctx.fillText(question, x/2 - 750, 380 + 30*i);
+			var fontsize = 20;
+			while (ctx.measureText(question).width > 760)
+			{
+				fontsize = fontsize - 2;
+				ctx.font = fontsize.toString() +"px Trebuchet MS";
+			}			
+			ctx.fillText(question, x/2 - 780, 380 + 30*i);
+			ctx.font = '20px Trebuchet MS';
 		}
 		else
 		{
-			ctx.fillText(summary, x/2 - 750, 380 + 30*i);
-			ctx.fillText(" : " + answer, x/2 - 750 + ctx.measureText(summary).width, 380 + 30*i);
+			var rem = 200;
+			while (ctx.measureText(question.substring(0,rem) + "... : " + answer + " - " + found).width > 750)
+			{
+				console.log(rem);
+				console.log(question.substring(0,rem));
+				console.log(ctx.measureText(question.substring(0,rem)).width);
+				rem = rem - 10;
+			}
+			var separator = "...";
+			if (question.substring(0,rem) == question)
+			{
+				separator = "";
+			}
+			ctx.fillText(question.substring(0,rem) + separator, x/2 - 780, 380 + 30*i);
+			ctx.fillText(" : " + answer, x/2 - 780 + ctx.measureText(question.substring(0,rem) + separator).width, 380 + 30*i);
 			ctx.fillStyle = getUserColor(found);
-			ctx.fillText(" - " + found, x/2 - 750 + ctx.measureText(summary + " : " + answer).width, 380 + 30*i);
+			ctx.fillText(" - " + found, x/2 - 780 + ctx.measureText(question.substring(0,rem) + separator + " : " + answer).width, 380 + 30*i);
 		}
 
 		ctx.font = '40px Trebuchet MS';
