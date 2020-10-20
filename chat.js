@@ -4,7 +4,7 @@ var x = 1900;
 var y = 920;
 
 var members = [{'user':'Personne','color':'#FF0000'},];
-var instruments = ['Batterie', 'Basse', 'Guitare', 'Voix'];
+var instruments = ['Batterie', 'Basse', 'Autre', 'Voix'];
 
 var points = [];
 var totalpoints = [];
@@ -276,14 +276,22 @@ ws.onmessage=function(event) {
 	{
 		if (msg.isBroadcaster == "true")
 		{
-			var so = msg.content.replace("!so ", "").replace("@", "");
-			var shout = [
-				"!say N'hésitez pas à aller faire un tour sur la chaîne Twitch de " + so + " ! C'est par ici : twitch.tv/" + so,
-				"!say Du contenu de qualité sur la chaîne de " + so + " ! Allez donc follow par ici : twitch.tv/" + so,
-				"!say On va tous follow la chaîne de " + so + " ! C'est par là : twitch.tv/" + so,
-				"!say Bonne ambiance et contenu de qualité chez " + so + " ! Pour follow : twitch.tv/" + so,
-			]
-			ws.send(shout[Math.floor(Math.random() * 4)]);
+			if(msg.content.replace("!so ", "").replace("@", "") == "ThomasHercouet")
+			{
+				ws.send("!say Ancien animateur radio, CM de chez Topito, créateur de la Nuit Originale, streameur, écrivain...  : Cet homme est multitalentueux, n'hésitez pas à follow Thomas Hercouët sur tous ses réseaux ! twitter.com/DrHercouet twitch.tv/thomashercouet");
+			}
+			else
+			{
+				var so = msg.content.replace("!so ", "").replace("@", "");
+				var shout = [
+					"!say N'hésitez pas à aller faire un tour sur la chaîne Twitch de " + so + " ! C'est par ici : twitch.tv/" + so,
+					"!say Du contenu de qualité sur la chaîne de " + so + " ! Allez donc follow par ici : twitch.tv/" + so,
+					"!say On va tous follow la chaîne de " + so + " ! C'est par là : twitch.tv/" + so,
+					"!say Bonne ambiance et contenu de qualité chez " + so + " ! Pour follow : twitch.tv/" + so,
+				]
+				ws.send(shout[Math.floor(Math.random() * 4)]);
+			}
+
 		}
 	}
 	else if (msg.content.startsWith("!start"))
@@ -525,7 +533,7 @@ ws.onmessage=function(event) {
 					songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found = msg.user;
 
 					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 1 point de plus pour toi TakeNRG");
-					addPoints(pts, msg.user);
+					addPoints(1, msg.user);
 					numberfound++;		
 				}
 			}
@@ -1038,6 +1046,7 @@ function drawQuiz()
 	for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].quiz.length; i++)
 	{
 		var question = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].question;
+		var category = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].category;
 		var found = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found;
 		var answer = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].answer;
 
@@ -1046,12 +1055,12 @@ function drawQuiz()
 		if (found == 'false')
 		{
 			var fontsize = 20;
-			while (ctx.measureText(question).width > 760)
+			while (ctx.measureText(category + " - " + question).width > 760)
 			{
-				fontsize = fontsize - 2;
+				fontsize = fontsize - 1;
 				ctx.font = fontsize.toString() +"px Trebuchet MS";
 			}			
-			ctx.fillText(question, x/2 - 780, 380 + 30*i);
+			ctx.fillText(category + " - " + question, x/2 - 780, 380 + 30*i);
 			ctx.font = '20px Trebuchet MS';
 		}
 		else
