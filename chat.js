@@ -6,6 +6,9 @@ var y = 920;
 var members = [{'user':'Personne','color':'#FF0000'},];
 var instruments = ['Batterie', 'Basse', 'Autre', 'Voix'];
 
+var categories = ['GEO', 'DIV', 'HIS', 'SCI', 'ART', 'SPL'];
+var colorcategories = ['#00DDEE', '#E02887', '#F5ED0B', '#31e62b', '#663300', '#F3961F'];
+
 var points = [];
 var totalpoints = [];
 
@@ -1055,13 +1058,28 @@ function drawQuiz()
 		if (found == 'false')
 		{
 			var fontsize = 20;
-			while (ctx.measureText(category + " - " + question).width > 760)
+			while (ctx.measureText(category + " " + question).width > 760)
 			{
 				fontsize = fontsize - 1;
 				ctx.font = fontsize.toString() +"px Trebuchet MS";
 			}			
-			ctx.fillText(category + " - " + question, x/2 - 780, 380 + 30*i);
+
+			ctx.strokeStyle = colorcategories[categories.indexOf(category)];
+			ctx.fillStyle = colorcategories[categories.indexOf(category)];
+			
 			ctx.font = '20px Trebuchet MS';
+			roundRect(ctx, x/2 - 780, 380 + 30*i - 18, ctx.measureText(category).width, 22, 10, true, true);
+
+			var catwidth = ctx.measureText(category).width;
+			ctx.fillStyle = 'black';
+			ctx.fillText(category, x/2 - 780, 380 + 30*i); 
+
+			ctx.fillStyle = 'white';
+			ctx.font = fontsize.toString() +"px Trebuchet MS";
+			ctx.fillText(" " + question, x/2 - 780 + catwidth, 380 + 30*i);
+			ctx.font = '20px Trebuchet MS';
+
+			ctx.fillStyle = 'white';
 		}
 		else
 		{
