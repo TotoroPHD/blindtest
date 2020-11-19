@@ -3,7 +3,16 @@ var ws = new WebSocket("ws://192.168.1.13:8100");
 var x = 1900;
 var y = 920;
 
-var members = [{'user':'Personne','color':'#FF0000'},];
+var members = 
+[
+	{ user: 'Personne', color: '#FF0000' },
+	{ user: 'TotoroPHD', color: 'red' },
+	{ user: 'Lokimolp', color: '#ff33fc' },
+	{ user: 'yumemasho', color: '#21A1BE' },
+	{ user: 'Lunevirtuelle', color: '#fabc14' }
+  ]
+  
+
 var instruments = ['Batterie', 'Basse', 'Autre', 'Voix'];
 
 var categories = ['GEO', 'DIV', 'HIS', 'SCI', 'ART', 'SPL'];
@@ -26,6 +35,11 @@ var defaultcdmosaic = 200;
 var lastuserfound = [];
 var lastsongfound = [];
 
+var collabpic = new Image();
+var collabblank = [];
+var collabsongs = [];
+var tbfcollab = [];
+
 var chat = [];
 
 var defaultdelay = 700;
@@ -44,6 +58,10 @@ var numberfound = 0;
 var songfound = false;
 var info1found = false;
 var info2found = false;
+
+var multisongs = [];
+//var trivialsongs = [];
+var stopsong;
 
 var songindex = 0;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
@@ -208,7 +226,7 @@ ws.onmessage=function(event) {
 	{
 		if (msg.isBroadcaster == "true" && songindex < songlist.find(x => x.listname === liste).songs.length - 1)
 		{
-			if (gametype == "single" || gametype == "double" || gametype == "quiz")
+			if (gametype == "single" || gametype == "double")
 			{
 				countdown = delay;
 				if (countdown > 0)
@@ -216,6 +234,23 @@ ws.onmessage=function(event) {
 					ws.send("!say Prochaine chanson dans...")
 				}
 				ready = false;
+			}
+
+			if (gametype == "collab")
+			{
+				ready = true;
+			}
+
+			if (gametype == "trivial")
+			{
+				ready = true;
+				// if (songindex > 0)
+				// {
+				// 	for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].quiz.length; i++)
+				// 	{
+				// 		trivialsongs[songindex][i].pause();
+				// 	}	
+				// }
 			}
 
 			bg="#000000";
@@ -229,7 +264,7 @@ ws.onmessage=function(event) {
 			winImage = "./images/"+liste+"/"+songindex+".jpg";
 			youtube = songlist.find(x => x.listname === liste).songs[songindex].youtube;
 
-			if (gametype == "single" || gametype == "quiz")
+			if (gametype == "single" || gametype == "trivial" || gametype == "collab")
 			{
 				singlewin = [];
 				song = songlist.find(x => x.listname === liste).songs[songindex].name;
@@ -253,6 +288,39 @@ ws.onmessage=function(event) {
 			{
 				cdmosaic = defaultcdmosaic;
 			}
+
+			if (gametype == "multi")
+			{
+				stopsong.pause();
+				stopsong.currentTime = 0;
+
+				for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++)
+				{
+					multisongs[songindex][i].play();
+				}
+			}	
+			
+			// if (gametype == "trivial")
+			// {			
+			// 	for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].quiz.length; i++)
+			// 	{
+			// 		trivialsongs[songindex][i].volume = 0;
+			// 		trivialsongs[songindex][i].currentTime = 0;
+			// 		trivialsongs[songindex][i].play();
+			// 	}		
+			// }	
+		}
+	}
+	else if (msg.content.startsWith("!replay"))
+	{
+		if (msg.isBroadcaster == "true")
+		{
+			for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
+				for (j = 0; j < songlist.find(x => x.listname === liste).songs[i].songs.length; j++)
+					{
+						multisongs[i][j].currentTime = 20;
+					}		
+			}			
 		}
 	}	
 	else if (msg.content.startsWith("!save"))
@@ -268,6 +336,8 @@ ws.onmessage=function(event) {
 	{
 		if (msg.isBroadcaster == "true")
 		{		
+			if (members.length > 0)ws.send(JSON.stringify(members));
+			if (totalpoints.length > 0)ws.send(JSON.stringify(totalpoints));			
 			resetvisibles();
 			if (points.length > 0)
 			{
@@ -339,13 +409,23 @@ ws.onmessage=function(event) {
 				
 				if (songlist.find(x => x.listname === liste).type == 'multi')
 				{				
-					gametype = "multi";				
+					gametype = "multi";			
+					preloadMulti();	
+					redraw();
 				}
 
-				if (songlist.find(x => x.listname === liste).type == 'quiz')
+				if (songlist.find(x => x.listname === liste).type == 'trivial')
 				{				
-					gametype = "quiz";				
+					//preloadTrivial();	
+					gametype = "trivial";
 				}
+
+				if (songlist.find(x => x.listname === liste).type == 'collab')
+				{				
+					gametype = "collab";
+					preloadCollab();
+					tbfcollab = Array.from(songlist.find(x => x.listname === liste).songs[0].songs);
+				}				
 
 				if (songlist.find(x => x.listname === liste).type == 'mosaic')
 				{				
@@ -382,7 +462,7 @@ ws.onmessage=function(event) {
 
 			for (var i = 0; i < chat.length; i++)chat[i].cur="no";
 
-			if (gametype == "single" || gametype == "quiz")
+			if (gametype == "single" || gametype == "trivial")
 			{
 				if (singlewin.length == 0)
 				{
@@ -394,6 +474,24 @@ ws.onmessage=function(event) {
 					givePoints(singlewin);
 				} 
 			}
+
+			if (gametype == "collab")
+			{
+				givePoints(singlewin);
+			}
+
+			if (gametype == "multi")
+			{
+				if (msg.isBroadcaster == "true")
+				{
+					for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
+						for (j = 0; j < songlist.find(x => x.listname === liste).songs[i].songs.length; j++)
+							{
+								multisongs[i][j].pause();
+							}		
+					}			
+				}				
+			}			
 
 			if (gametype == "double")
 			{
@@ -452,7 +550,7 @@ ws.onmessage=function(event) {
 			votes = [];
 		}
 	}		
-	else if ((gametype == "single" || gametype == "quiz") && ready == true)
+	else if ((gametype == "single" || gametype == "trivial" || gametype == "collab") && ready == true)
 	{
 		addChat(msg.user, msg.content, "", "yes");
 
@@ -492,7 +590,11 @@ ws.onmessage=function(event) {
 					countdown = -1;
 					//ready = false;
 
-					drawSingleWin();
+					if (gametype != "collab")
+					{
+						drawSingleWin();
+					}
+					
 					givePoints(singlewin);
 					
 					for (var i = 0; i < chat.length; i++)chat[i].cur="no";
@@ -505,7 +607,7 @@ ws.onmessage=function(event) {
 			}
 		}
 
-		if (numberfound < 4 && gametype == "quiz")
+		if (numberfound < 4 && gametype == "trivial")
 		{
 			for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].quiz.length; i++){
 				var lev = 0.75;
@@ -531,6 +633,7 @@ ws.onmessage=function(event) {
 				}
 				if (ok)
 				{			
+					//trivialsongs[songindex][numberfound].volume = 1;
 					chat[chat.length - 1].found = "⭐";
 					chat[chat.length - 1].cur = "no";
 					songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found = msg.user;
@@ -540,6 +643,46 @@ ws.onmessage=function(event) {
 					numberfound++;		
 				}
 			}
+		}
+
+		if (numberfound < 25 && gametype == "collab")
+		{
+			for (var i = 0; i < tbfcollab.length; i++){
+				var lev = 0.75;
+				var inf = tbfcollab[i].name;
+				var alt = tbfcollab[i].alternate;
+				var found = tbfcollab[i].found;
+				var ok = false;
+				
+				if (similarity(msg.content, inf) >= lev)
+				{
+					ok = true;
+				}
+				if (alt != '' && similarity(msg.content, alt) >= lev)
+				{
+					ok = true;
+				}
+				if (found != 'false')
+				{
+					ok = false;
+				}
+				if (ok)
+				{			
+					chat[chat.length - 1].found = "⭐";
+					chat[chat.length - 1].cur = "no";
+					tbfcollab[i].found = msg.user;
+
+					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 3 points de plus pour toi TakeNRG");
+					addPoints(3, msg.user);
+					numberfound++;		
+				}
+			}
+		}
+
+		if (numberfound == 25 && gametype == "collab")
+		{
+			numberfound = 26;
+			ws.send("!say SingsNote Vous avez tout trouvé SingsNote ! Bravo ! Et " +  singlewin.length + " personnes ont trouvé l'artiste de la pochette ! PogChamp");
 		}
 	}
 	else if (gametype == "double" && ready == true)
@@ -623,12 +766,12 @@ ws.onmessage=function(event) {
 		
 		if (songindex >= 0)
 		{
-			var pts = 6 - numberfound;
-
-			for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++){
-				var inf = songlist.find(x => x.listname === liste).songs[i].name;
-				var alt = songlist.find(x => x.listname === liste).songs[i].alternate;
-				var found = songlist.find(x => x.listname === liste).songs[i].found;
+			var pts = Math.round((6 - numberfound)/2);
+			
+			for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++){
+				var inf = songlist.find(x => x.listname === liste).songs[songindex].songs[i].name;
+				var alt = songlist.find(x => x.listname === liste).songs[songindex].songs[i].alternate;
+				var found = songlist.find(x => x.listname === liste).songs[songindex].songs[i].found;
 				var ok = false;
 				
 				
@@ -647,9 +790,10 @@ ws.onmessage=function(event) {
 				if (ok)
 				{			
 					chat[chat.length - 1].found = "🏅";
-					songlist.find(x => x.listname === liste).songs[i].found = numberfound;
-					songlist.find(x => x.listname === liste).songs[i].user = msg.user;
-					if (numberfound < 5)
+					songlist.find(x => x.listname === liste).songs[songindex].songs[i].found = numberfound;
+					songlist.find(x => x.listname === liste).songs[songindex].songs[i].user = msg.user;
+					multisongs[songindex][i].pause();
+					if (numberfound < 4)
 					{
 						ws.send("!say GivePLZ Bravo @" + msg.user + " ! " + pts.toString() + " points de plus pour toi TakeNRG" );
 					}
@@ -667,17 +811,16 @@ ws.onmessage=function(event) {
 		{
 			if (songfound == false)
 			{
+				stopsong.play();
 				ws.send("!say Bravo, vous avez tout trouvé ! Pour réécouter tranquillement : " );
-				for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++){
-					ws.send("!say " + songlist.find(x => x.listname === liste).songs[i].name + " - " + songlist.find(x => x.listname === liste).songs[i].youtube);
+				for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++){
+					ws.send("!say " + songlist.find(x => x.listname === liste).songs[songindex].songs[i].fullname + " - " + songlist.find(x => x.listname === liste).songs[songindex].songs[i].youtube);
 				}
 			}
-
 			songfound = true;
 		}
 
-		drawMultiTags();
-		drawMultiSongs();			
+			
 	}
 	else if (gametype == 'vote')
 	{		
@@ -793,7 +936,7 @@ function drawTitle()
 	ctx.font = '20px Trebuchet MS';
 	ctx.fillText(subtitle, x/2 - ctx.measureText(subtitle).width/2, 80);
 
-	if (gametype == 'single' || gametype == 'double' || gametype == 'quiz')
+	if (gametype == 'single' || gametype == 'double' || gametype == 'trivial')
 	{
 		ctx.font = '40px Trebuchet MS';
 		var tot = songlist.find(x => x.listname === liste).songs.length;
@@ -961,7 +1104,7 @@ function drawWinImage()
 		var hRatio = 380/img.width;
 		var vRatio = 555/img.height;
 		
-		if (gametype == 'quiz')
+		if (gametype == 'trivial')
 		{
 			var vRatio = 380/img.height;			
 		}
@@ -972,7 +1115,7 @@ function drawWinImage()
 		var yoffset = 0;
 		if (ratio == hRatio)
 		{
-			if (gametype == 'quiz')
+			if (gametype == 'trivial')
 			{
 				yoffset = Math.round((380 - img.height*ratio)/2);
 			}
@@ -989,7 +1132,7 @@ function drawWinImage()
 		ctx.fillStyle='white';
 		ctx.strokeStyle='white';
 		
-		if (gametype == 'quiz')
+		if (gametype == 'trivial')
 		{
 			ctx.drawImage(img, 0,0, img.width, img.height, x/2 - 400 + xoffset, 515 + yoffset, img.width*ratio, img.height*ratio);
 			roundRect(ctx,x/2-400, 515, 380,380,5,false);
@@ -1020,11 +1163,11 @@ function drawMultiTags()
 function drawMultiSongs()
 {
 	ctx.font = '18px Trebuchet MS';
-	for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
-		var mulsong = songlist.find(x => x.listname === liste).songs.find(x => x.found === i)
+	for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++) {
+		var mulsong = songlist.find(x => x.listname === liste).songs[songindex].songs.find(x => x.found === i)
 		if (mulsong != undefined)
 		{
-			var usr = songlist.find(x => x.listname === liste).songs.find(x => x.found === i).user;
+			var usr = songlist.find(x => x.listname === liste).songs[songindex].songs.find(x => x.found === i).user;
 			ctx.fillStyle = getUserColor(usr);
 			ctx.fillText(usr, x/2 - 750 + ctx.measureText("Chanson X : ").width, 150 + 30*i);
 			ctx.fillStyle = "white";
@@ -1036,7 +1179,9 @@ function drawMultiSongs()
 
 function drawQuiz()
 {
-	drawCadre("white", 160, 218);
+	ctx.strokeStyle="white";
+	ctx.fillStyle="black";
+	roundRect(ctx, x/2 - 800, 338, 1500, 160, 20, true );
 
 	if (visiblewin == false)
 	{
@@ -1053,53 +1198,32 @@ function drawQuiz()
 		var found = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].found;
 		var answer = songlist.find(x => x.listname === liste).songs[songindex].quiz[i].answer;
 
+		ctx.strokeStyle = colorcategories[categories.indexOf(category)];
+		ctx.fillStyle = colorcategories[categories.indexOf(category)];
+		
+		ctx.font = '20px Trebuchet MS';
+		roundRect(ctx, x/2 - 785, 380 + 30*i - 18, ctx.measureText(category).width, 22, 10, true, true);
+
+		var catwidth = ctx.measureText(category).width;
+		ctx.fillStyle = 'black';
+		ctx.fillText(category, x/2 - 785, 380 + 30*i); 
+
 		ctx.font = '20px Trebuchet MS';
 		ctx.fillStyle = 'white';
+
 		if (found == 'false')
 		{
-			var fontsize = 20;
-			while (ctx.measureText(category + " " + question).width > 760)
-			{
-				fontsize = fontsize - 1;
-				ctx.font = fontsize.toString() +"px Trebuchet MS";
-			}			
-
-			ctx.strokeStyle = colorcategories[categories.indexOf(category)];
-			ctx.fillStyle = colorcategories[categories.indexOf(category)];
-			
-			ctx.font = '20px Trebuchet MS';
-			roundRect(ctx, x/2 - 780, 380 + 30*i - 18, ctx.measureText(category).width, 22, 10, true, true);
-
-			var catwidth = ctx.measureText(category).width;
-			ctx.fillStyle = 'black';
-			ctx.fillText(category, x/2 - 780, 380 + 30*i); 
-
 			ctx.fillStyle = 'white';
-			ctx.font = fontsize.toString() +"px Trebuchet MS";
-			ctx.fillText(" " + question, x/2 - 780 + catwidth, 380 + 30*i);
 			ctx.font = '20px Trebuchet MS';
-
+			ctx.fillText(" " + question, x/2 - 785 + catwidth, 380 + 30*i);
 			ctx.fillStyle = 'white';
 		}
 		else
 		{
-			var rem = 200;
-			while (ctx.measureText(question.substring(0,rem) + "... : " + answer + " - " + found).width > 750)
-			{
-				console.log(rem);
-				console.log(question.substring(0,rem));
-				console.log(ctx.measureText(question.substring(0,rem)).width);
-				rem = rem - 10;
-			}
-			var separator = "...";
-			if (question.substring(0,rem) == question)
-			{
-				separator = "";
-			}
-			ctx.fillText(question.substring(0,rem) + separator, x/2 - 780, 380 + 30*i);
-			ctx.fillText(" : " + answer, x/2 - 780 + ctx.measureText(question.substring(0,rem) + separator).width, 380 + 30*i);
+			ctx.fillText(question, x/2 - 785 + catwidth + ctx.measureText(" ").width, 380 + 30*i);
+			ctx.fillText(" : " + answer, x/2 - 785 + catwidth + ctx.measureText(" " + question).width, 380 + 30*i);
 			ctx.fillStyle = getUserColor(found);
-			ctx.fillText(" - " + found, x/2 - 780 + ctx.measureText(question.substring(0,rem) + separator + " : " + answer).width, 380 + 30*i);
+			ctx.fillText(" - " + found, x/2 - 785 + catwidth + ctx.measureText(" " + question + " : " + answer).width, 380 + 30*i);
 		}
 
 		ctx.font = '40px Trebuchet MS';
@@ -1124,7 +1248,10 @@ function redraw()
 
 	ctx.clearRect(0,0,x,y);
 
-	if (gametype == "single" || gametype == "quiz")
+	drawChat();
+	drawTitle();
+
+	if (gametype == "single" || gametype == "trivial")
 	{
 		drawCadre("white");
 		if (songfound == false)
@@ -1145,10 +1272,15 @@ function redraw()
 			else drawSingleWin();
 		}
 
-		if (gametype == "quiz" && songindex >= 0)
+		if (gametype == "trivial" && songindex >= 0)
 		{
 			drawQuiz();
 		}
+
+		if (gametype == "collab" && songindex >= 0)
+		{
+			drawCollab();
+		}		
 	}
 
 	if (gametype == "double")
@@ -1178,10 +1310,24 @@ function redraw()
 		else
 		{
 			drawCadre("red");
+			
 		}
 		
-		drawMultiTags();
-		drawMultiSongs();
+		if (songindex >= 0)
+		{
+			drawMultiTags();
+			drawMultiSongs();			
+		}
+		else
+		{
+			if (singletext != undefined)
+			{
+				ctx.font = '40px Trebuchet MS';
+				ctx.fillStyle = 'white';
+				ctx.fillText(singletext, x/2 - 400 - ctx.measureText(singletext).width/2, 230);
+				ctx.font = '20px Trebuchet MS';
+			}
+		}
 	}
 
 	if (gametype == 'mosaic')
@@ -1196,8 +1342,17 @@ function redraw()
 		}
 	}
 
-	drawChat();
-	drawTitle();
+	if (gametype == 'collab')
+	{	
+		if (songindex < 0)
+		{
+			drawCollab();
+		}
+		else
+		{
+			fillCollab();
+		}
+	}
 
 	if (visiblepoints || visibletotalpoints)
 	{
@@ -1346,10 +1501,39 @@ function displayPoints()
 	}
 }
 
+function drawCollab()
+{
+	ctx.strokeStyle="white";
+	
+	roundRect(ctx, x/2 - 780, 135, 750, 750);
+	
+	for (var i = 0; i < 4; i++) {
+		ctx.fillRect(x/2 - 780, 135 + 150 + i*150, 750, 4);
+		ctx.fillRect(x/2 - 780 + 150 + i*150, 135, 4, 750);
+	}
+}
+
+function fillCollab()
+{
+	ctx.drawImage(collabpic, x/2 - 780, 135, 750, 750);
+
+	for (var i = 0; i < 25; i++) {
+		var x0 = x/2 - 780;
+		var y0 = 135;
+
+		if (tbfcollab[i].found == 'false')
+		{
+			var rank = tbfcollab[i].rank;
+			ctx.drawImage(collabblank[rank],x0 + rank%5 * 150, y0+Math.trunc(rank/5)*150, 150, 150);
+		}
+	}		
+	drawCollab();
+}
+
 function drawMosaic()
 {
 	ctx.strokeStyle="white";
-	ctx.fillstyle="black";
+	ctx.fillStyle="black";
 	roundRect(ctx, x/2 - 780, 135, 750, 750);
 	for (var i = 0; i < 2; i++) {
 		ctx.fillRect(x/2 - 780, 135 + 248 + i*250, 750, 4);
@@ -1375,8 +1559,51 @@ function preloadMosaic(length)
 	for (var i = 0; i < 9; i++){
 		curmosaic[i].cover = coverpic.length - 1;
 	}
-
 }
+
+function preloadCollab()
+{
+	collabpic.src = "./images/"+liste+"/0.jpg"; // Définit le chemin vers sa source
+
+	for (var i = 0; i < 25; i++){
+		collabblank[i] = new Image();
+		collabblank[i].src = "./collab/"+i+".jpg";
+		collabsongs[i] = new Audio();
+		collabsongs[i].src = "./collab/"+i+".mp3";
+	}
+}
+
+function preloadMulti()
+{
+	stopsong = new Audio();
+	stopsong.src = "./stop.mp3";
+
+	for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
+		if (!multisongs[i]) multisongs[i] = [];
+		for (j = 0; j < songlist.find(x => x.listname === liste).songs[i].songs.length; j++)
+			{
+				multisongs[i][j] = new Audio();
+				multisongs[i][j].src = "./multi/"+i+"/"+j+".mp3";
+				multisongs[i][j].currentTime = 20;
+			}		
+	}
+}
+
+// function preloadTrivial()
+// {
+// 	stopsong = new Audio();
+// 	stopsong.src = "./stop.mp3";
+
+// 	for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
+// 		if (!trivialsongs[i]) trivialsongs[i] = [];
+// 		for (j = 0; j < songlist.find(x => x.listname === liste).songs[i].quiz.length; j++)
+// 			{
+// 				trivialsongs[i][j] = new Audio();
+// 				trivialsongs[i][j].src = "./trivial/"+i+"/"+j+".mp3";
+// 				trivialsongs[i][j].currentTime = 20;
+// 			}		
+// 	}
+// }
 
 function fillMosaic()
 {
@@ -1708,6 +1935,31 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 					curmosaic[i].cover++
 				}
 			}
+		}
+	}
+
+	if (gametype == "multi" && songindex == -1)
+	{
+		var ok = true;
+		for (var i = 0; i < songlist.find(x => x.listname === liste).songs.length; i++) {
+			for (j = 0; j < songlist.find(x => x.listname === liste).songs[i].songs.length; j++)
+				{
+					if (multisongs[i][j].readyState != 4)
+					{
+						ok = false;
+					}
+				}		
+		}
+
+		if (ok)
+		{
+			singletext = "Toutes les chansons ont été chargées !";
+			redraw();
+		}
+		else
+		{
+			singletext = "Chargement des chansons en cours...";
+			redraw();
 		}
 	}
   }, 10);
