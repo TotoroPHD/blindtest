@@ -21,6 +21,8 @@ var colorcategories = ['#00DDEE', '#E02887', '#F5ED0B', '#31e62b', '#663300', '#
 var points = [];
 var totalpoints = [];
 
+var debugInc = 0;
+
 var voteprop = [];
 var votes = [];
 
@@ -43,11 +45,13 @@ var tbfcollab = [];
 var chat = [];
 
 var defaultdelay = 700;
+//var defaultdelay = 0;
 var delay = 0;
 var countdown = -1;
 var ready = false;
 
 var nbwin = 3;
+//var defaultnbwin = 1;
 var defaultnbwin = 3;
 var singlewin = [];
 
@@ -62,6 +66,8 @@ var info2found = false;
 var multisongs = [];
 //var trivialsongs = [];
 var stopsong;
+var countries = [];
+var countryanswer;
 
 var songindex = 0;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
@@ -73,11 +79,15 @@ var singletext = '';
 var liste = "begin";
 var bg = "#000000";
 
+var years = [];
+
 var visiblepoints = false;
 var visibletheme = false;
 var visibletotalpoints = false;
 var visiblevote = false;
 var visiblewin = false;
+var visiblecountries = false;
+var visibleyear = false;
 
 var canvas = document.getElementById("canvas");
 
@@ -222,11 +232,28 @@ ws.onmessage=function(event) {
 			ws.send("!load");
 		}
 	}
+	else if (msg.content == "!lost")
+	{
+		if (msg.isBroadcaster == "true")
+		{		
+			if (gametype == "multi" && songfound == true)
+			{
+				ws.send("!say Grmblblbl... 1 point bonus pour vous : ");
+				var toGive = "";
+				for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++)
+				{
+					toGive += "@" + songlist.find(x => x.listname === liste).songs[songindex].songs[i].user + " ";
+					addPoints(1, songlist.find(x => x.listname === liste).songs[songindex].songs[i].user);
+				}
+				ws.send("!say " + toGive);
+			}
+		}
+	}	
 	else if (msg.content.startsWith("!next") || msg.content.startsWith("!go"))
 	{
 		if (msg.isBroadcaster == "true" && songindex < songlist.find(x => x.listname === liste).songs.length - 1)
 		{
-			if (gametype == "single" || gametype == "double")
+			if (gametype == "single" || gametype == "double" || gametype == "year")
 			{
 				countdown = delay;
 				if (countdown > 0)
@@ -264,7 +291,7 @@ ws.onmessage=function(event) {
 			winImage = "./images/"+liste+"/"+songindex+".jpg";
 			youtube = songlist.find(x => x.listname === liste).songs[songindex].youtube;
 
-			if (gametype == "single" || gametype == "trivial" || gametype == "collab")
+			if (gametype == "single" || gametype == "trivial" || gametype == "collab" || gametype == "year")
 			{
 				singlewin = [];
 				song = songlist.find(x => x.listname === liste).songs[songindex].name;
@@ -274,6 +301,12 @@ ws.onmessage=function(event) {
 				if (singletext == undefined)
 				{
 					singletext = "C'est parti pour la chanson " + (songindex+1);
+				}
+
+				if (gametype == "year")
+				{
+					visibleyear = true;
+					years = [];
 				}
 			}
 			
@@ -293,7 +326,7 @@ ws.onmessage=function(event) {
 			{
 				stopsong.pause();
 				stopsong.currentTime = 0;
-
+				countries = [];
 				for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++)
 				{
 					multisongs[songindex][i].play();
@@ -323,6 +356,50 @@ ws.onmessage=function(event) {
 			}			
 		}
 	}	
+	else if (msg.content.startsWith("!pays"))
+	{
+		if (gametype == "multi" && songfound == false)
+		{
+			if (countries.find(x => x.user === msg.user) != undefined)
+			{
+				countries.find(x => x.user === msg.user).country = msg.content.replace("!pays ","");
+			}
+			else
+			{
+				countries.push({'user':msg.user,'country':msg.content.replace("!pays ","")});	
+			}
+			ws.send("!say Ok " + msg.user + " Ton pays est : " + msg.content.replace("!pays ",""));
+		}
+	}
+	else if (msg.content.startsWith("!bonuscountry"))
+	{
+		if (msg.isBroadcaster == "true" && gametype == "multi" && songfound == true)
+		{		
+			ws.send("!say Bravo à vous ! 1 point bonus pour : ");
+			var toGive = "";
+			for (var i = 0; i < countries.length; i++) {
+
+				if (similarity(countries.country, countryanswer) >= 0.75)
+				{
+					ctx.fillStyle="green";
+					toGive += "@" + countries.user;
+					addPoints(1, usr);
+				}
+				ctx.fillText(" " + ctr, x/2 - 400 + colx - wcountry/2 + ctx.measureText(usr).width, 320 - hpoints/2 + 90 + curi*25);
+			}
+			ws.send("!say " + toGive);
+		}
+	}	
+	else if (msg.content.startsWith("!country"))
+	{
+		if (msg.isBroadcaster == "true" && gametype == "multi" && songfound == true)
+		{		
+			visiblecountries = true;
+			countryanswer = msg.content.replace("!country ", "")
+			displayCountries();
+			redraw();
+		}
+	}		
 	else if (msg.content.startsWith("!save"))
 	{
 		if (msg.isBroadcaster == "true")
@@ -420,6 +497,11 @@ ws.onmessage=function(event) {
 					gametype = "trivial";
 				}
 
+				if (songlist.find(x => x.listname === liste).type == 'year')
+				{				
+					gametype = "year";
+				}				
+
 				if (songlist.find(x => x.listname === liste).type == 'collab')
 				{				
 					gametype = "collab";
@@ -478,6 +560,7 @@ ws.onmessage=function(event) {
 			if (gametype == "collab")
 			{
 				givePoints(singlewin);
+				visiblewin = false;
 			}
 
 			if (gametype == "multi")
@@ -508,7 +591,13 @@ ws.onmessage=function(event) {
 
 				info1found = true;
 				info2found = true;
-			}				
+			}			
+			
+			if (gametype == "year")
+			{
+				visiblewin = true;
+				giveYearPoints(songlist.find(x => x.listname === liste).songs[songindex].name);
+			}			
 
 			if (youtube != undefined)
 			{
@@ -556,12 +645,16 @@ ws.onmessage=function(event) {
 
 		if (songfound == false)
 		{
+			var lev = 0.75;
+			if (songlist.find(x => x.listname === liste).songs[songindex].lev != undefined)
+				lev = songlist.find(x => x.listname === liste).songs[songindex].lev
+
 			var ok = false;
-			if (similarity(msg.content, song) > 0.75)
+			if (similarity(msg.content, song) > lev)
 			{
 				ok = true;
 			}
-			if (alternate != '' && similarity(msg.content, alternate) > 0.75)
+			if (alternate != '' && similarity(msg.content, alternate) > lev)
 			{
 				ok = true;
 			}
@@ -906,6 +999,26 @@ ws.onmessage=function(event) {
 			songfound = true;
 		}
 	}
+	else if (gametype == 'year')
+	{
+		addChat(msg.user, msg.content, "", "yes");
+		var year = msg.content;
+
+		if (!isNaN(year) && ready)
+		{
+			if (year > 1900 && year < 2050)
+			{
+				if (years.find(x => x.user === msg.user) != undefined)
+				{
+					years.find(x => x.user === msg.user).year = msg.content;
+				}
+				else
+				{
+					years.push({'user':msg.user,'year':msg.content});	
+				}
+			}
+		}
+	}
 	else addChat(msg.user, msg.content, "", "no");
 
 	redraw();
@@ -936,7 +1049,7 @@ function drawTitle()
 	ctx.font = '20px Trebuchet MS';
 	ctx.fillText(subtitle, x/2 - ctx.measureText(subtitle).width/2, 80);
 
-	if (gametype == 'single' || gametype == 'double' || gametype == 'trivial')
+	if (gametype == 'single' || gametype == 'double' || gametype == 'trivial' || gametype == 'year')
 	{
 		ctx.font = '40px Trebuchet MS';
 		var tot = songlist.find(x => x.listname === liste).songs.length;
@@ -995,11 +1108,6 @@ function drawSingleWin()
 		}
 		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 280);
 		ctx.font = '20px Trebuchet MS';
-
-		if (winImage != undefined && visiblewin)
-		{
-			drawWinImage();
-		}
 }
 
 function drawSingleLose()
@@ -1015,11 +1123,6 @@ function drawSingleLose()
 		}
 		ctx.fillText(fullsongname, x/2 - 400 - ctx.measureText(fullsongname).width/2, 280);
 		ctx.font = '20px Trebuchet MS';
-		
-		if (winImage != undefined && visiblewin)
-		{
-			drawWinImage();
-		}
 }
 
 function drawDoubleTags()
@@ -1071,11 +1174,6 @@ function drawDoubleWin(info)
 			curposwin += ctx.measureText(", ").width;
 		}
 	}
-	
-	if (winImage != undefined && visiblewin)
-	{
-		drawWinImage();
-	}	
 }
 
 function givePoints(win)
@@ -1104,7 +1202,7 @@ function drawWinImage()
 		var hRatio = 380/img.width;
 		var vRatio = 555/img.height;
 		
-		if (gametype == 'trivial')
+		if (gametype == 'trivial' || gametype == 'year')
 		{
 			var vRatio = 380/img.height;			
 		}
@@ -1115,7 +1213,7 @@ function drawWinImage()
 		var yoffset = 0;
 		if (ratio == hRatio)
 		{
-			if (gametype == 'trivial')
+			if (gametype == 'trivial' || gametype == 'year')
 			{
 				yoffset = Math.round((380 - img.height*ratio)/2);
 			}
@@ -1132,7 +1230,7 @@ function drawWinImage()
 		ctx.fillStyle='white';
 		ctx.strokeStyle='white';
 		
-		if (gametype == 'trivial')
+		if (gametype == 'trivial' || gametype == 'year')
 		{
 			ctx.drawImage(img, 0,0, img.width, img.height, x/2 - 400 + xoffset, 515 + yoffset, img.width*ratio, img.height*ratio);
 			roundRect(ctx,x/2-400, 515, 380,380,5,false);
@@ -1364,10 +1462,25 @@ function redraw()
 		displayThemes();		
 	}	
 
+	if (visiblecountries)
+	{
+		displayCountries();		
+	}	
+
 	if (visiblevote)
 	{
 		displayVote();		
 	}
+
+	if (winImage != undefined && visiblewin)
+	{
+		drawWinImage();
+	}	
+
+	if (visibleyear)
+	{
+		displayYears();		
+	}	
 }
 
 function addPoints(amount, user)
@@ -1381,7 +1494,7 @@ function addPoints(amount, user)
 		points.push({'user':user,'points':amount, 'gold':0, 'silver':0, 'bronze':0});	
 	}
 	
-	if(amount >= 0 && gametype != "multi")
+	if(amount >= 0)
 	{
 		var tot = amount;
 
@@ -1501,6 +1614,154 @@ function displayPoints()
 	}
 }
 
+function displayCountries()
+{
+	if (visiblecountries)
+	{
+		var maxheight = 12;
+		var column = 1 + Math.trunc((countries.length-1)/maxheight);
+
+		var hpoints = 90 + countries.length * 25;
+		if (countries.length > maxheight)
+		{
+			hpoints = 90 + maxheight * 25
+		}
+		var wpoints = 300 * column;
+
+		ctx.clearRect(x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints);
+
+		ctx.fillStyle=bg;
+		if (visiblecountries){ctx.strokeStyle="pink";}else{ctx.strokeStyle="purple";}
+		
+		roundRect(ctx, x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints, 20, true);
+
+		ctx.font = '40px Trebuchet MS';
+		ctx.fillStyle=ctx.strokeStyle;
+		ctx.fillText("Pays", x/2 - 400 - ctx.measureText("Pays").width/2, 320 - hpoints/2 + 50);
+
+		ctx.font = '18px Trebuchet MS';
+		
+		for (var i = 0; i < countries.length; i++) {
+			var curcol = 1 + Math.trunc(i/maxheight);
+			var colx = 0;
+			colx = 300*curcol - 150 - 300*(column/2);
+			var curi = i%maxheight;
+			
+			var usr = countries[i].user;
+			var ctr = countries[i].country;
+			
+			var wcountry = ctx.measureText(usr + " - " + ctr).width;
+
+			ctx.fillStyle=getUserColor(usr);
+			ctx.fillText(usr, x/2 - 400 + colx - wcountry/2, 320 - hpoints/2 + 90 + curi*25);
+
+			ctx.fillStyle="white";
+
+			if (similarity(ctr, countryanswer) >= 0.75)
+			{
+				ctx.fillStyle="green";
+			}
+
+			ctx.fillText(" " + ctr, x/2 - 400 + colx - wcountry/2 + ctx.measureText(usr).width, 320 - hpoints/2 + 90 + curi*25);
+		}
+		ctx.fillStyle="white";
+		ctx.strokeStyle="white";
+		ctx.font = '20px Trebuchet MS';
+	}
+}
+
+function displayYears()
+{
+	if (visibleyear)
+	{
+		var maxheight = 12;
+		var column = 1 + Math.trunc((years.length-1)/maxheight);
+
+		var hpoints = 90 + years.length * 25;
+		if (years.length > maxheight)
+		{
+			hpoints = 90 + maxheight * 25
+		}
+		var wpoints = 300 * column;
+
+		ctx.clearRect(x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints);
+
+		ctx.fillStyle=bg;
+		ctx.strokeStyle="pink";
+		
+		roundRect(ctx, x/2 - 400 - wpoints/2, 320 - hpoints/2, wpoints, hpoints, 20, true);
+
+		ctx.font = '40px Trebuchet MS';
+		ctx.fillStyle=ctx.strokeStyle;
+		ctx.fillText("Années", x/2 - 400 - ctx.measureText("Années").width/2, 320 - hpoints/2 + 50);
+
+		ctx.font = '18px Trebuchet MS';
+		
+		for (var i = 0; i < years.length; i++) {
+			var curcol = 1 + Math.trunc(i/maxheight);
+			var colx = 0;
+			colx = 300*curcol - 150 - 300*(column/2);
+			var curi = i%maxheight;
+			
+			var usr = years[i].user;
+			var yea = years[i].year;
+			
+			var wyea = ctx.measureText(usr + " - " + yea).width;
+
+			ctx.fillStyle=getUserColor(usr);
+			ctx.fillText(usr, x/2 - 400 + colx - wyea/2, 320 - hpoints/2 + 90 + curi*25);
+
+			ctx.fillStyle="white";
+			var medal = " ";
+			if (songfound)
+			{
+				if (yea == parseInt(songlist.find(x => x.listname === liste).songs[songindex].name))
+				{
+					ctx.fillStyle = "green";
+					medal = "🥇";
+				}
+				else if (Math.abs(yea - parseInt(songlist.find(x => x.listname === liste).songs[songindex].name)) == 1)
+				{
+					ctx.fillStyle = "yellow";
+					medal = "🥈";
+				}
+				else if (Math.abs(yea - parseInt(songlist.find(x => x.listname === liste).songs[songindex].name)) == 2)
+				{
+					ctx.fillStyle = "orange";
+					medal = "🥉";
+				}
+				else
+				{
+					ctx.fillStyle = "red";
+				}
+			}
+			ctx.fillText(medal + yea, x/2 - 400 + colx - wyea/2 + ctx.measureText(usr).width, 320 - hpoints/2 + 90 + curi*25);
+
+		}
+		ctx.fillStyle="white";
+		ctx.strokeStyle="white";
+		ctx.font = '20px Trebuchet MS';
+	}
+}
+
+function giveYearPoints(year)
+{
+	for (var i = 0; i < years.length; i++) {
+		if (years[i].year == year)
+		{
+			addPoints(3, years[i].user);
+		}
+		else if (Math.abs(years[i].year - year) == 1)
+		{
+			addPoints(2, years[i].user);
+		}
+		else if (Math.abs(years[i].year - year) == 2)
+		{
+			addPoints(1, years[i].user);
+		}		
+	}
+}
+
 function drawCollab()
 {
 	ctx.strokeStyle="white";
@@ -1568,8 +1829,6 @@ function preloadCollab()
 	for (var i = 0; i < 25; i++){
 		collabblank[i] = new Image();
 		collabblank[i].src = "./collab/"+i+".jpg";
-		collabsongs[i] = new Audio();
-		collabsongs[i].src = "./collab/"+i+".mp3";
 	}
 }
 
@@ -1847,6 +2106,8 @@ function resetvisibles()
 	visibletheme = false;
 	visiblevote = false;
 	visiblewin = false;
+	visiblecountries = false;
+	visibleyear = false;
 }
 
 /**

@@ -77,6 +77,7 @@ ws.on('connection', function (ws) {
       if (obj[0].points != undefined)
       {
       console.log("Total trouvé !");
+      console.log(obj);
       total = obj;
       }		  
     }
