@@ -88,6 +88,8 @@ var singletext = '';
 var liste = "begin";
 var bg = "#000000";
 
+var djviewers = [];
+
 var years = [];
 var gus = [];
 var gusstop = false;
@@ -324,7 +326,7 @@ ws.onmessage = function (event) {
 	}
 	else if (msg.content.startsWith("!next") || msg.content.startsWith("!go")) {
 		if (msg.isBroadcaster == "true" && songindex < songlist.find(x => x.listname === liste).songs.length - 1) {
-			if (gametype == "single" || gametype == "double" || gametype == "gus") {
+			if (gametype == "single" || gametype == "double" || gametype == "gus" || gametype == "djviewers") {
 				countdown = delay;
 				if (countdown > 0) {
 					ws.send("!say Prochaine chanson dans...")
@@ -365,7 +367,7 @@ ws.onmessage = function (event) {
 
 			youtube = songlist.find(x => x.listname === liste).songs[songindex].youtube;
 
-			if (gametype == "single" || gametype == "trivial" || gametype == "collab" || gametype == "year" | gametype == "gus") {
+			if (gametype == "single" || gametype == "trivial" || gametype == "collab" || gametype == "year" | gametype == "gus" | gametype == "djviewers") {
 				singlewin = [];
 				song = songlist.find(x => x.listname === liste).songs[songindex].name;
 				alternate = songlist.find(x => x.listname === liste).songs[songindex].alternate;
@@ -525,6 +527,12 @@ ws.onmessage = function (event) {
 					gametype = "trivial";
 				}
 
+				if (songlist.find(x => x.listname === liste).type == 'djviewers')
+				{				
+					gametype = "djviewers";		
+					preloadDJ(songlist.find(x => x.listname === liste).songs.length);
+				}				
+
 				if (songlist.find(x => x.listname === liste).type == 'year') {
 					gametype = "year";
 				}
@@ -579,7 +587,7 @@ ws.onmessage = function (event) {
 
 			for (var i = 0; i < chat.length; i++)chat[i].cur = "no";
 
-			if (gametype == "single" || gametype == "trivial" || gametype == "gus") {
+			if (gametype == "single" || gametype == "trivial" || gametype == "gus" || gametype == "djviewers") {
 				if (singlewin.length == 0) {
 					drawSingleLose();
 				}
@@ -654,7 +662,7 @@ ws.onmessage = function (event) {
 			votes = [];
 		}
 	}
-	else if ((gametype == "single" || gametype == "trivial" || gametype == "collab" || gametype == "gus") && ready == true) {
+	else if ((gametype == "single" || gametype == "trivial" || gametype == "collab" || gametype == "gus" || gametype == "djviewers") && ready == true) {
 		addChat(msg.user, msg.content, "", "yes");
 
 		if (songfound == false) {
@@ -672,7 +680,7 @@ ws.onmessage = function (event) {
 			}
 			if (singlewin.find(x => x.user === msg.user) != undefined) {
 				// UNCOMMENT
-				ok = false;
+				//ok = false;
 			}
 			if (ok) {
 				if (singlewin.length == 0) chat[chat.length - 1].found = "🥇";
@@ -781,6 +789,18 @@ ws.onmessage = function (event) {
 						gus.splice(gus.findIndex(duplicate), 1);
 					}
 					gus.push({ 'user': msg.user.toString().toString(), 'minutes': parseInt(msg.content, 10) });
+				}
+			}
+		}
+
+		if(gametype == "djviewers")
+		{
+			if(!isNaN(parseInt(msg.content)) && songfound == false)
+			{
+				var sample = parseInt(msg.content);
+				if(sample >= 0 && (sample <= songlist.find(x => x.listname === liste).songs[songindex].samples))
+				{
+					djviewers[songindex][sample].play();
 				}
 			}
 		}
@@ -1016,7 +1036,7 @@ function drawTitle() {
 	ctx.font = '20px Trebuchet MS';
 	ctx.fillText(subtitle, x / 2 - ctx.measureText(subtitle).width / 2, 80);
 
-	if (gametype == "single" || gametype == "double" || gametype == "trivial" || gametype == "year" || gametype == "gus") {
+	if (gametype == "single" || gametype == "double" || gametype == "trivial" || gametype == "year" || gametype == "gus" || gametype == "djviewers") {
 		ctx.font = '40px Trebuchet MS';
 		var tot = songlist.find(x => x.listname === liste).songs.length;
 		ctx.fillText((songindex + 1) + "/" + tot, x / 2 - 700, 68);
@@ -1292,7 +1312,7 @@ function redraw() {
 	drawChat();
 	drawTitle();
 
-	if (gametype == "single" || gametype == "trivial" || gametype == "gus") {
+	if (gametype == "single" || gametype == "trivial" || gametype == "gus" || gametype == "djviewers") {
 		drawCadre("white");
 		if (songfound == false) {
 			if (singletext != undefined) {
@@ -1667,10 +1687,17 @@ function displayGus() {
 		ctx.font = '30px Trebuchet MS';
 		ctx.fillStyle = ctx.strokeStyle;
 		if (!gusstop) {
-			ctx.fillText("Âge", x / 2 - 400 - ctx.measureText("Âge").width / 2, 350);
+			ctx.fillText("# Albums", x / 2 - 400 - ctx.measureText("# Albums").width / 2, 350);
 		}
 		else {
-			ctx.fillText("Réponse : " + ansmin + " ans", x / 2 - 400 - ctx.measureText("Réponse : " + ansmin + " ans").width / 2, 350);
+			if (ansmin == 1)
+			{
+				ctx.fillText("Réponse : " + ansmin + "  album", x / 2 - 400 - ctx.measureText("Réponse : " + ansmin + " album").width / 2, 350);
+			}
+			else
+			{
+				ctx.fillText("Réponse : " + ansmin + "  albums", x / 2 - 400 - ctx.measureText("Réponse : " + ansmin + " albums").width / 2, 350);
+			}
 		}
 
 		ctx.font = '18px Trebuchet MS';
@@ -1697,11 +1724,11 @@ function displayGus() {
 					ctx.fillStyle = "green";
 					medal = "🥇";
 				}
-				else if (Math.abs(min - ansmin) >= 1 && Math.abs(min - ansmin) <= 5) {
+				else if (Math.abs(min - ansmin) >= 1 && Math.abs(min - ansmin) <= 2) {
 					ctx.fillStyle = "yellow";
 					medal = "🥈";
 				}
-				else if (Math.abs(min - ansmin) > 5 && Math.abs(min - ansmin) <= 10) {
+				else if (Math.abs(min - ansmin) > 2 && Math.abs(min - ansmin) <= 5) {
 					ctx.fillStyle = "orange";
 					medal = "🥉";
 				}
@@ -1760,10 +1787,10 @@ function giveGusPoints(minutes) {
 				}
 			}
 		}
-		else if (Math.abs(gus[i].minutes - minutes) >= 1 && Math.abs(gus[i].minutes - minutes) <= 5) {
+		else if (Math.abs(gus[i].minutes - minutes) >= 1 && Math.abs(gus[i].minutes - minutes) <= 2) {
 			addPoints(2, gus[i].user);
 		}
-		else if (Math.abs(gus[i].minutes - minutes) > 5 && Math.abs(gus[i].minutes - minutes) <= 10) {
+		else if (Math.abs(gus[i].minutes - minutes) > 2 && Math.abs(gus[i].minutes - minutes) <= 5) {
 			addPoints(1, gus[i].user);
 		}
 	}
@@ -1851,6 +1878,22 @@ function preloadMulti() {
 			multisongs[i][j].src = "./multi/" + i + "/" + j + ".mp3";
 			multisongs[i][j].currentTime = 20;
 		}
+	}
+}
+
+function preloadDJ(length)
+{
+
+	//ffmpeg -i test.mp3 -f segment -segment_time 1 -c copy %01d.mp3
+	//find . -name '*.mp3' -exec ffmpeg -y -i {} -af "afade=t=in:st=0:d=0.1" -hide_banner -loglevel panic {} \;
+
+	for (var i = 0; i < length; i++) {
+		if (!djviewers[i]) djviewers[i] = [];
+		for (var j = 0; j < songlist.find(x => x.listname === liste).songs[i].samples; j++)
+			{
+				djviewers[i][j] = new Audio();
+				djviewers[i][j].src = "./djviewers/"+liste+"/"+i+"/"+j+".mp3";
+			}		
 	}
 }
 
@@ -2286,4 +2329,19 @@ setInterval(function () {
 			redraw();
 		}
 	}
+
+	if (gametype == "djviewers" && songindex == -1) {
+
+		var lgth = songlist.find(x => x.listname === liste).songs.length;
+		var sample = songlist.find(x => x.listname === liste).songs[lgth - 1].samples;
+		if (djviewers[lgth - 1][sample - 1].readyState == 4)
+		{
+			singletext = "Toutes les chansons ont été chargées !";
+			redraw();
+		}
+		else {
+			singletext = "Chargement des chansons en cours...";
+			redraw();
+		}			
+	}	
 }, 10);
