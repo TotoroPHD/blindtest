@@ -15,95 +15,92 @@ var members =
 		{ user: 'Lunevirtuelle', color: '#fabc14' }
 	]
 
-var tokens = [];
 
+	var totalpoints = [
+		{ user: 'poopinette1', points: 73, gold: 8, silver: 13, bronze: 23 },
+		{ user: 'benlal', points: 56, gold: 12, silver: 8, bronze: 4 },
+		{ user: 'Laure_____', points: 91, gold: 13, silver: 17, bronze: 18 },
+		{ user: 'foamyrep', points: 4, gold: 1, silver: 0, bronze: 1 },
+		{ user: 'biotgosse', points: 69, gold: 12, silver: 9, bronze: 15 },
+		{ user: 'Sombwich', points: 107, gold: 15, silver: 19, bronze: 24 },
+		{
+		  user: 'antoine_g_28',
+		  points: 93,
+		  gold: 14,
+		  silver: 13,
+		  bronze: 25
+		},
+		{ user: 'MinaLae', points: 45, gold: 4, silver: 8, bronze: 17 },
+		{ user: 'Nolette_', points: 31, gold: 5, silver: 4, bronze: 8 },
+		{ user: 'PrinceYaku', points: 226, gold: 49, silver: 25, bronze: 29 },
+		{ user: 'Lunevirtuelle', points: 15, gold: 2, silver: 0, bronze: 9 },
+		{ user: 'AnErsatz_', points: 52, gold: 5, silver: 11, bronze: 15 },
+		{ user: 'treguy', points: 15, gold: 4, silver: 1, bronze: 1 },
+		{
+		  user: 'sophiste_petoncule',
+		  points: 44,
+		  gold: 7,
+		  silver: 6,
+		  bronze: 11
+		},
+		{
+		  user: 'gusgusgusgus_',
+		  points: 69,
+		  gold: 9,
+		  silver: 11,
+		  bronze: 20
+		},
+		{ user: 'yumemasho', points: 52, gold: 4, silver: 11, bronze: 18 },
+		{ user: 'Volhta', points: 42, gold: 5, silver: 8, bronze: 11 },
+		{ user: 'Abawouak', points: 2, gold: 0, silver: 1, bronze: 0 },
+		{
+		  user: 'YvonnePistachette',
+		  points: 5,
+		  gold: 0,
+		  silver: 1,
+		  bronze: 3
+		},
+		{ user: 'Sirgeese', points: 22, gold: 4, silver: 4, bronze: 2 },
+		{ user: 'DaitheArts', points: 16, gold: 1, silver: 2, bronze: 9 },
+		{ user: 'ThomasHercouet', points: 2, gold: 0, silver: 1, bronze: 0 }
+	  ]
+	  
 var instruments = ['Batterie', 'Basse', 'Autre', 'Voix'];
-
 var categories = [' 1 ', ' 2 ', ' 3 ', ' 4 '];
 var colorcategories = ['#00DDEE', '#E02887', '#F5ED0B', '#31e62b'];
 
-var points = [];
-var totalpoints = [];
+var tokens = [], points = [], voteprop = [], votes = [], collabblank = [], collabsongs = [], seloupoivre = []
+var tbfcollab = [], collabfound = [], chat = [], bonusletters = [], bonusprop = [], bonusans = [], singlewin = [], djviewers = [], years = [], gus = [], hintpic = []
+var ready = false, songfound = false, info1found = false, info2found = false, gusstop = false, selstop = false, hint = false, loadedhint = false
 
-var debugInc = 0;
+var visiblepoints = false, visiblecollabpoints = false, visibletheme = false, visibletotalpoints = false, visiblevote = false, visiblewin = false, visibleyear = false, visiblesel = false, visiblegus = false, visiblebonus = false
 
-var voteprop = [];
-var votes = [];
+var debugInc = 0, delay = 0, numberfound = 0, songindex = 0, hintreveal = 0, countdownhint = 0, collabtime = 0
 
 var collabpic = new Image();
-var collabblank = [];
-var collabsongs = [];
-var tbfcollab = [];
 
-var chat = [];
-
-var bonusword;
-var bonusletters = [];
-var bonusprop = [];
-var bonusans = [];
+var bonusword, stopsong, youtube, winImage, fullsongname, singletext, alternate;
 var bonusfound = "false";
-var defaultdelay = 700;
-//var defaultdelay = 0;
-var delay = 0;
-var countdown = -1;
-var ready = false;
 
-var nbwin = 3;
+var defaultdelay = 700;
+var seldelay = 1000;
+
+var defaultdelay = 0;
+
+var countdown = -1;
+var countdownsel = -1;
+var nbwin, defaultnbwin = 3;
+
 //var defaultnbwin = 1;
-var defaultnbwin = 3;
-var singlewin = [];
 
 var doublewin = [[], []];
 
 var gametype = "idle";
-var numberfound = 0;
-var songfound = false;
-var info1found = false;
-var info2found = false;
-
-var multisongs = [];
-//var trivialsongs = [];
-var stopsong;
-
-var songindex = 0;
 var song = "Ceci est un nom de chanson totalement random pour commencer le jeu";
-var youtube;
-var winImage;
-var alternate = '';
-var fullsongname;
-var singletext = '';
 var liste = "begin";
 var bg = "#000000";
 
-var djviewers = [];
-
-var years = [];
-var gus = [];
-var gusstop = false;
-
-var visiblepoints = false;
-var visibletheme = false;
-var visibletotalpoints = false;
-var visiblevote = false;
-var visiblewin = false;
-var visibleyear = false;
-var visibleselr = false;
-var visiblegus = false;
-var visiblebonus = false;
-
-var hintreveal = 0;
-var hint = false;
-var countdownhint = 0;
-var hintpic = [];
-var loadedhint = false;
-
-var Latinise = {}; Latinise.latin_map = { "Á": "A", "Ă": "A", "Ắ": "A", "Ặ": "A", "Ằ": "A", "Ẳ": "A", "Ẵ": "A", "Ǎ": "A", "Â": "A", "Ấ": "A", "Ậ": "A", "Ầ": "A", "Ẩ": "A", "Ẫ": "A", "Ä": "A", "Ǟ": "A", "Ȧ": "A", "Ǡ": "A", "Ạ": "A", "Ȁ": "A", "À": "A", "Ả": "A", "Ȃ": "A", "Ā": "A", "Ą": "A", "Å": "A", "Ǻ": "A", "Ḁ": "A", "Ⱥ": "A", "Ã": "A", "Ꜳ": "AA", "Æ": "AE", "Ǽ": "AE", "Ǣ": "AE", "Ꜵ": "AO", "Ꜷ": "AU", "Ꜹ": "AV", "Ꜻ": "AV", "Ꜽ": "AY", "Ḃ": "B", "Ḅ": "B", "Ɓ": "B", "Ḇ": "B", "Ƀ": "B", "Ƃ": "B", "Ć": "C", "Č": "C", "Ç": "C", "Ḉ": "C", "Ĉ": "C", "Ċ": "C", "Ƈ": "C", "Ȼ": "C", "Ď": "D", "Ḑ": "D", "Ḓ": "D", "Ḋ": "D", "Ḍ": "D", "Ɗ": "D", "Ḏ": "D", "ǲ": "D", "ǅ": "D", "Đ": "D", "Ƌ": "D", "Ǳ": "DZ", "Ǆ": "DZ", "É": "E", "Ĕ": "E", "Ě": "E", "Ȩ": "E", "Ḝ": "E", "Ê": "E", "Ế": "E", "Ệ": "E", "Ề": "E", "Ể": "E", "Ễ": "E", "Ḙ": "E", "Ë": "E", "Ė": "E", "Ẹ": "E", "Ȅ": "E", "È": "E", "Ẻ": "E", "Ȇ": "E", "Ē": "E", "Ḗ": "E", "Ḕ": "E", "Ę": "E", "Ɇ": "E", "Ẽ": "E", "Ḛ": "E", "Ꝫ": "ET", "Ḟ": "F", "Ƒ": "F", "Ǵ": "G", "Ğ": "G", "Ǧ": "G", "Ģ": "G", "Ĝ": "G", "Ġ": "G", "Ɠ": "G", "Ḡ": "G", "Ǥ": "G", "Ḫ": "H", "Ȟ": "H", "Ḩ": "H", "Ĥ": "H", "Ⱨ": "H", "Ḧ": "H", "Ḣ": "H", "Ḥ": "H", "Ħ": "H", "Í": "I", "Ĭ": "I", "Ǐ": "I", "Î": "I", "Ï": "I", "Ḯ": "I", "İ": "I", "Ị": "I", "Ȉ": "I", "Ì": "I", "Ỉ": "I", "Ȋ": "I", "Ī": "I", "Į": "I", "Ɨ": "I", "Ĩ": "I", "Ḭ": "I", "Ꝺ": "D", "Ꝼ": "F", "Ᵹ": "G", "Ꞃ": "R", "Ꞅ": "S", "Ꞇ": "T", "Ꝭ": "IS", "Ĵ": "J", "Ɉ": "J", "Ḱ": "K", "Ǩ": "K", "Ķ": "K", "Ⱪ": "K", "Ꝃ": "K", "Ḳ": "K", "Ƙ": "K", "Ḵ": "K", "Ꝁ": "K", "Ꝅ": "K", "Ĺ": "L", "Ƚ": "L", "Ľ": "L", "Ļ": "L", "Ḽ": "L", "Ḷ": "L", "Ḹ": "L", "Ⱡ": "L", "Ꝉ": "L", "Ḻ": "L", "Ŀ": "L", "Ɫ": "L", "ǈ": "L", "Ł": "L", "Ǉ": "LJ", "Ḿ": "M", "Ṁ": "M", "Ṃ": "M", "Ɱ": "M", "Ń": "N", "Ň": "N", "Ņ": "N", "Ṋ": "N", "Ṅ": "N", "Ṇ": "N", "Ǹ": "N", "Ɲ": "N", "Ṉ": "N", "Ƞ": "N", "ǋ": "N", "Ñ": "N", "Ǌ": "NJ", "Ó": "O", "Ŏ": "O", "Ǒ": "O", "Ô": "O", "Ố": "O", "Ộ": "O", "Ồ": "O", "Ổ": "O", "Ỗ": "O", "Ö": "O", "Ȫ": "O", "Ȯ": "O", "Ȱ": "O", "Ọ": "O", "Ő": "O", "Ȍ": "O", "Ò": "O", "Ỏ": "O", "Ơ": "O", "Ớ": "O", "Ợ": "O", "Ờ": "O", "Ở": "O", "Ỡ": "O", "Ȏ": "O", "Ꝋ": "O", "Ꝍ": "O", "Ō": "O", "Ṓ": "O", "Ṑ": "O", "Ɵ": "O", "Ǫ": "O", "Ǭ": "O", "Ø": "O", "Ǿ": "O", "Õ": "O", "Ṍ": "O", "Ṏ": "O", "Ȭ": "O", "Ƣ": "OI", "Ꝏ": "OO", "Ɛ": "E", "Ɔ": "O", "Ȣ": "OU", "Ṕ": "P", "Ṗ": "P", "Ꝓ": "P", "Ƥ": "P", "Ꝕ": "P", "Ᵽ": "P", "Ꝑ": "P", "Ꝙ": "Q", "Ꝗ": "Q", "Ŕ": "R", "Ř": "R", "Ŗ": "R", "Ṙ": "R", "Ṛ": "R", "Ṝ": "R", "Ȑ": "R", "Ȓ": "R", "Ṟ": "R", "Ɍ": "R", "Ɽ": "R", "Ꜿ": "C", "Ǝ": "E", "Ś": "S", "Ṥ": "S", "Š": "S", "Ṧ": "S", "Ş": "S", "Ŝ": "S", "Ș": "S", "Ṡ": "S", "Ṣ": "S", "Ṩ": "S", "Ť": "T", "Ţ": "T", "Ṱ": "T", "Ț": "T", "Ⱦ": "T", "Ṫ": "T", "Ṭ": "T", "Ƭ": "T", "Ṯ": "T", "Ʈ": "T", "Ŧ": "T", "Ɐ": "A", "Ꞁ": "L", "Ɯ": "M", "Ʌ": "V", "Ꜩ": "TZ", "Ú": "U", "Ŭ": "U", "Ǔ": "U", "Û": "U", "Ṷ": "U", "Ü": "U", "Ǘ": "U", "Ǚ": "U", "Ǜ": "U", "Ǖ": "U", "Ṳ": "U", "Ụ": "U", "Ű": "U", "Ȕ": "U", "Ù": "U", "Ủ": "U", "Ư": "U", "Ứ": "U", "Ự": "U", "Ừ": "U", "Ử": "U", "Ữ": "U", "Ȗ": "U", "Ū": "U", "Ṻ": "U", "Ų": "U", "Ů": "U", "Ũ": "U", "Ṹ": "U", "Ṵ": "U", "Ꝟ": "V", "Ṿ": "V", "Ʋ": "V", "Ṽ": "V", "Ꝡ": "VY", "Ẃ": "W", "Ŵ": "W", "Ẅ": "W", "Ẇ": "W", "Ẉ": "W", "Ẁ": "W", "Ⱳ": "W", "Ẍ": "X", "Ẋ": "X", "Ý": "Y", "Ŷ": "Y", "Ÿ": "Y", "Ẏ": "Y", "Ỵ": "Y", "Ỳ": "Y", "Ƴ": "Y", "Ỷ": "Y", "Ỿ": "Y", "Ȳ": "Y", "Ɏ": "Y", "Ỹ": "Y", "Ź": "Z", "Ž": "Z", "Ẑ": "Z", "Ⱬ": "Z", "Ż": "Z", "Ẓ": "Z", "Ȥ": "Z", "Ẕ": "Z", "Ƶ": "Z", "Ĳ": "IJ", "Œ": "OE", "ᴀ": "A", "ᴁ": "AE", "ʙ": "B", "ᴃ": "B", "ᴄ": "C", "ᴅ": "D", "ᴇ": "E", "ꜰ": "F", "ɢ": "G", "ʛ": "G", "ʜ": "H", "ɪ": "I", "ʁ": "R", "ᴊ": "J", "ᴋ": "K", "ʟ": "L", "ᴌ": "L", "ᴍ": "M", "ɴ": "N", "ᴏ": "O", "ɶ": "OE", "ᴐ": "O", "ᴕ": "OU", "ᴘ": "P", "ʀ": "R", "ᴎ": "N", "ᴙ": "R", "ꜱ": "S", "ᴛ": "T", "ⱻ": "E", "ᴚ": "R", "ᴜ": "U", "ᴠ": "V", "ᴡ": "W", "ʏ": "Y", "ᴢ": "Z", "á": "a", "ă": "a", "ắ": "a", "ặ": "a", "ằ": "a", "ẳ": "a", "ẵ": "a", "ǎ": "a", "â": "a", "ấ": "a", "ậ": "a", "ầ": "a", "ẩ": "a", "ẫ": "a", "ä": "a", "ǟ": "a", "ȧ": "a", "ǡ": "a", "ạ": "a", "ȁ": "a", "à": "a", "ả": "a", "ȃ": "a", "ā": "a", "ą": "a", "ᶏ": "a", "ẚ": "a", "å": "a", "ǻ": "a", "ḁ": "a", "ⱥ": "a", "ã": "a", "ꜳ": "aa", "æ": "ae", "ǽ": "ae", "ǣ": "ae", "ꜵ": "ao", "ꜷ": "au", "ꜹ": "av", "ꜻ": "av", "ꜽ": "ay", "ḃ": "b", "ḅ": "b", "ɓ": "b", "ḇ": "b", "ᵬ": "b", "ᶀ": "b", "ƀ": "b", "ƃ": "b", "ɵ": "o", "ć": "c", "č": "c", "ç": "c", "ḉ": "c", "ĉ": "c", "ɕ": "c", "ċ": "c", "ƈ": "c", "ȼ": "c", "ď": "d", "ḑ": "d", "ḓ": "d", "ȡ": "d", "ḋ": "d", "ḍ": "d", "ɗ": "d", "ᶑ": "d", "ḏ": "d", "ᵭ": "d", "ᶁ": "d", "đ": "d", "ɖ": "d", "ƌ": "d", "ı": "i", "ȷ": "j", "ɟ": "j", "ʄ": "j", "ǳ": "dz", "ǆ": "dz", "é": "e", "ĕ": "e", "ě": "e", "ȩ": "e", "ḝ": "e", "ê": "e", "ế": "e", "ệ": "e", "ề": "e", "ể": "e", "ễ": "e", "ḙ": "e", "ë": "e", "ė": "e", "ẹ": "e", "ȅ": "e", "è": "e", "ẻ": "e", "ȇ": "e", "ē": "e", "ḗ": "e", "ḕ": "e", "ⱸ": "e", "ę": "e", "ᶒ": "e", "ɇ": "e", "ẽ": "e", "ḛ": "e", "ꝫ": "et", "ḟ": "f", "ƒ": "f", "ᵮ": "f", "ᶂ": "f", "ǵ": "g", "ğ": "g", "ǧ": "g", "ģ": "g", "ĝ": "g", "ġ": "g", "ɠ": "g", "ḡ": "g", "ᶃ": "g", "ǥ": "g", "ḫ": "h", "ȟ": "h", "ḩ": "h", "ĥ": "h", "ⱨ": "h", "ḧ": "h", "ḣ": "h", "ḥ": "h", "ɦ": "h", "ẖ": "h", "ħ": "h", "ƕ": "hv", "í": "i", "ĭ": "i", "ǐ": "i", "î": "i", "ï": "i", "ḯ": "i", "ị": "i", "ȉ": "i", "ì": "i", "ỉ": "i", "ȋ": "i", "ī": "i", "į": "i", "ᶖ": "i", "ɨ": "i", "ĩ": "i", "ḭ": "i", "ꝺ": "d", "ꝼ": "f", "ᵹ": "g", "ꞃ": "r", "ꞅ": "s", "ꞇ": "t", "ꝭ": "is", "ǰ": "j", "ĵ": "j", "ʝ": "j", "ɉ": "j", "ḱ": "k", "ǩ": "k", "ķ": "k", "ⱪ": "k", "ꝃ": "k", "ḳ": "k", "ƙ": "k", "ḵ": "k", "ᶄ": "k", "ꝁ": "k", "ꝅ": "k", "ĺ": "l", "ƚ": "l", "ɬ": "l", "ľ": "l", "ļ": "l", "ḽ": "l", "ȴ": "l", "ḷ": "l", "ḹ": "l", "ⱡ": "l", "ꝉ": "l", "ḻ": "l", "ŀ": "l", "ɫ": "l", "ᶅ": "l", "ɭ": "l", "ł": "l", "ǉ": "lj", "ſ": "s", "ẜ": "s", "ẛ": "s", "ẝ": "s", "ḿ": "m", "ṁ": "m", "ṃ": "m", "ɱ": "m", "ᵯ": "m", "ᶆ": "m", "ń": "n", "ň": "n", "ņ": "n", "ṋ": "n", "ȵ": "n", "ṅ": "n", "ṇ": "n", "ǹ": "n", "ɲ": "n", "ṉ": "n", "ƞ": "n", "ᵰ": "n", "ᶇ": "n", "ɳ": "n", "ñ": "n", "ǌ": "nj", "ó": "o", "ŏ": "o", "ǒ": "o", "ô": "o", "ố": "o", "ộ": "o", "ồ": "o", "ổ": "o", "ỗ": "o", "ö": "o", "ȫ": "o", "ȯ": "o", "ȱ": "o", "ọ": "o", "ő": "o", "ȍ": "o", "ò": "o", "ỏ": "o", "ơ": "o", "ớ": "o", "ợ": "o", "ờ": "o", "ở": "o", "ỡ": "o", "ȏ": "o", "ꝋ": "o", "ꝍ": "o", "ⱺ": "o", "ō": "o", "ṓ": "o", "ṑ": "o", "ǫ": "o", "ǭ": "o", "ø": "o", "ǿ": "o", "õ": "o", "ṍ": "o", "ṏ": "o", "ȭ": "o", "ƣ": "oi", "ꝏ": "oo", "ɛ": "e", "ᶓ": "e", "ɔ": "o", "ᶗ": "o", "ȣ": "ou", "ṕ": "p", "ṗ": "p", "ꝓ": "p", "ƥ": "p", "ᵱ": "p", "ᶈ": "p", "ꝕ": "p", "ᵽ": "p", "ꝑ": "p", "ꝙ": "q", "ʠ": "q", "ɋ": "q", "ꝗ": "q", "ŕ": "r", "ř": "r", "ŗ": "r", "ṙ": "r", "ṛ": "r", "ṝ": "r", "ȑ": "r", "ɾ": "r", "ᵳ": "r", "ȓ": "r", "ṟ": "r", "ɼ": "r", "ᵲ": "r", "ᶉ": "r", "ɍ": "r", "ɽ": "r", "ↄ": "c", "ꜿ": "c", "ɘ": "e", "ɿ": "r", "ś": "s", "ṥ": "s", "š": "s", "ṧ": "s", "ş": "s", "ŝ": "s", "ș": "s", "ṡ": "s", "ṣ": "s", "ṩ": "s", "ʂ": "s", "ᵴ": "s", "ᶊ": "s", "ȿ": "s", "ɡ": "g", "ᴑ": "o", "ᴓ": "o", "ᴝ": "u", "ť": "t", "ţ": "t", "ṱ": "t", "ț": "t", "ȶ": "t", "ẗ": "t", "ⱦ": "t", "ṫ": "t", "ṭ": "t", "ƭ": "t", "ṯ": "t", "ᵵ": "t", "ƫ": "t", "ʈ": "t", "ŧ": "t", "ᵺ": "th", "ɐ": "a", "ᴂ": "ae", "ǝ": "e", "ᵷ": "g", "ɥ": "h", "ʮ": "h", "ʯ": "h", "ᴉ": "i", "ʞ": "k", "ꞁ": "l", "ɯ": "m", "ɰ": "m", "ᴔ": "oe", "ɹ": "r", "ɻ": "r", "ɺ": "r", "ⱹ": "r", "ʇ": "t", "ʌ": "v", "ʍ": "w", "ʎ": "y", "ꜩ": "tz", "ú": "u", "ŭ": "u", "ǔ": "u", "û": "u", "ṷ": "u", "ü": "u", "ǘ": "u", "ǚ": "u", "ǜ": "u", "ǖ": "u", "ṳ": "u", "ụ": "u", "ű": "u", "ȕ": "u", "ù": "u", "ủ": "u", "ư": "u", "ứ": "u", "ự": "u", "ừ": "u", "ử": "u", "ữ": "u", "ȗ": "u", "ū": "u", "ṻ": "u", "ų": "u", "ᶙ": "u", "ů": "u", "ũ": "u", "ṹ": "u", "ṵ": "u", "ᵫ": "ue", "ꝸ": "um", "ⱴ": "v", "ꝟ": "v", "ṿ": "v", "ʋ": "v", "ᶌ": "v", "ⱱ": "v", "ṽ": "v", "ꝡ": "vy", "ẃ": "w", "ŵ": "w", "ẅ": "w", "ẇ": "w", "ẉ": "w", "ẁ": "w", "ⱳ": "w", "ẘ": "w", "ẍ": "x", "ẋ": "x", "ᶍ": "x", "ý": "y", "ŷ": "y", "ÿ": "y", "ẏ": "y", "ỵ": "y", "ỳ": "y", "ƴ": "y", "ỷ": "y", "ỿ": "y", "ȳ": "y", "ẙ": "y", "ɏ": "y", "ỹ": "y", "ź": "z", "ž": "z", "ẑ": "z", "ʑ": "z", "ⱬ": "z", "ż": "z", "ẓ": "z", "ȥ": "z", "ẕ": "z", "ᵶ": "z", "ᶎ": "z", "ʐ": "z", "ƶ": "z", "ɀ": "z", "ﬀ": "ff", "ﬃ": "ffi", "ﬄ": "ffl", "ﬁ": "fi", "ﬂ": "fl", "ĳ": "ij", "œ": "oe", "ﬆ": "st", "ₐ": "a", "ₑ": "e", "ᵢ": "i", "ⱼ": "j", "ₒ": "o", "ᵣ": "r", "ᵤ": "u", "ᵥ": "v", "ₓ": "x" };
-String.prototype.latinise = function () { return this.replace(/[^A-Za-z0-9\[\] ]/g, function (a) { return Latinise.latin_map[a] || a }) };
-String.prototype.latinize = String.prototype.latinise;
-String.prototype.isLatin = function () { return this == this.latinise() }
-
 var canvas = document.getElementById("canvas");
-
 var ctx = canvas.getContext("2d");
 ctx.font = '20px Trebuchet MS';
 ctx.fillStyle = "white";
@@ -171,6 +168,9 @@ ws.onmessage = function (event) {
 	else if (msg.content == "!twitter") {
 		ws.send("!say Suivez moi sur Twitter pour ne pas louper les prochains blindtest ! https://twitter.com/AfkCafe");
 	}
+	else if (msg.content == "!yaku") {
+		ws.send("!say Allez faire un tour sur le compte Twitter des playlists de PrinceYaku ! https://twitter.com/DJDYCIAN Une playlist par semaine, 24 titres, tous les dimanches !");
+	}
 	else if (msg.content == "!clearchat") {
 		if (msg.isBroadcaster == "true") {
 			chat = [];
@@ -195,7 +195,6 @@ ws.onmessage = function (event) {
 
 					if (similarity(prop, bonusword) >= 0.80) {
 						ws.send("!say Félicitations, le mot était bien " + bonusword + "! 3 points bonus pour " + msg.user);
-						ws.send("!say !applause");
 						addPoints(3, msg.user);
 						bonusfound = msg.user;
 
@@ -300,11 +299,15 @@ ws.onmessage = function (event) {
 	}
 	else if (msg.content.startsWith("!next") || msg.content.startsWith("!go")) {
 		if (msg.isBroadcaster == "true" && songindex < songlist.find(x => x.listname === liste).songs.length - 1) {
-			if (gametype == "single" || gametype == "double" || gametype == "gus") {
+			if (gametype == "single" || gametype == "double" || gametype == "gus" || gametype == "sel") {
 				countdown = delay;
 				if (countdown > 0) {
 					ws.send("!say Prochaine chanson dans...")
 				}
+
+				if (gametype == 'sel')
+					countdownsel = seldelay;
+
 				ready = false;
 			}
 
@@ -342,8 +345,7 @@ ws.onmessage = function (event) {
 					if (singletext == undefined) {
 						singletext = "C'est parti pour la chanson " + (songindex + 1);
 					}
-					switch (gametype)
-					{
+					switch (gametype) {
 						case 'djviewers':
 							singletext = "La chanson dure " + songlist.find(x => x.listname === liste).songs[songindex].samples + " secondes";
 							break;
@@ -358,6 +360,9 @@ ws.onmessage = function (event) {
 							break;
 						case 'sel':
 							visiblesel = true;
+							seloupoivre = [];
+							selstop = false;
+							break;
 					}
 					break;
 				case 'double':
@@ -371,7 +376,11 @@ ws.onmessage = function (event) {
 					for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++) {
 						multisongs[songindex][i].play();
 					}
-					break;					
+					break;
+				case 'sel':
+					visiblesel = true;
+					seloupoivre = [];
+					break;
 				default:
 					console.log('gametype not found')
 			}
@@ -401,6 +410,12 @@ ws.onmessage = function (event) {
 			if (points.length > 0) {
 				visiblepoints = !visiblepoints;
 			}
+		}
+	}
+	else if (msg.content == "!collabscore") {
+		if (msg.isBroadcaster == "true") {
+			resetvisibles();
+			visiblecollabpoints = !visiblecollabpoints;
 		}
 	}
 	else if (msg.content.startsWith("!so ")) {
@@ -476,15 +491,15 @@ ws.onmessage = function (event) {
 						redraw();
 						break;
 					case 'trivial':
-						//preloadTrivial();	
-					case 'djviewers': 
+					//preloadTrivial();	
+					case 'djviewers':
 						preloadDJ(songlist.find(x => x.listname === liste).songs.length)
 						break;
 					case 'collab':
 						preloadCollab();
 						tbfcollab = Array.from(songlist.find(x => x.listname === liste).songs[0].songs);
 						break;
-					case 'double': 
+					case 'double':
 						info1found = false;
 						info2found = false;
 					default:
@@ -605,7 +620,7 @@ ws.onmessage = function (event) {
 			}
 			if (singlewin.find(x => x.user === msg.user) != undefined) {
 				// UNCOMMENT
-				//ok = false;
+				ok = false;
 			}
 			if (ok) {
 				if (singlewin.length == 0) chat[chat.length - 1].found = "🥇";
@@ -622,7 +637,10 @@ ws.onmessage = function (event) {
 					songfound = true;
 
 					countdown = -1;
-					//ready = false;
+					if(gametype != 'gus')
+					{
+						ready = false;
+					}
 
 					if (gametype != "collab") {
 						drawSingleWin();
@@ -672,12 +690,12 @@ ws.onmessage = function (event) {
 			}
 		}
 
-		if (numberfound < 25 && gametype == "collab") {
+		if (gametype == 'collab' && ready) {
 			for (var i = 0; i < tbfcollab.length; i++) {
 				var lev = 0.75;
 				var inf = tbfcollab[i].name;
 				var alt = tbfcollab[i].alternate;
-				var found = tbfcollab[i].found;
+				//var found = tbfcollab[i].found;
 				var ok = false;
 
 				if (similarity(msg.content, inf) >= lev) {
@@ -686,46 +704,71 @@ ws.onmessage = function (event) {
 				if (alt != '' && similarity(msg.content, alt) >= lev) {
 					ok = true;
 				}
-				if (found != 'false') {
-					ok = false;
-				}
-				if (ok) {
-					chat[chat.length - 1].found = "⭐";
-					chat[chat.length - 1].cur = "no";
-					tbfcollab[i].found = msg.user;
 
-					ws.send("!say GivePLZ Bravo @" + msg.user + " ! 3 points de plus pour toi TakeNRG");
-					addPoints(3, msg.user);
-					numberfound++;
+				if (ok) {
+					if (!collabfound[i]) collabfound[i] = [];
+
+					if(collabfound[i].length < 3)
+					{
+						if (collabfound[i].find(x => x.user === msg.user) == undefined) {
+
+							collabfound[i].push({'user':msg.user,'time':collabtime})
+							if (collabfound[i].length > 0)
+							{
+								tbfcollab[i].found = true;
+								switch(collabfound[i].length){
+									case 1:
+										addPoints(3, msg.user)
+										break;
+									case 2:
+										addPoints(2, msg.user)
+										break;									
+									case 3:
+										addPoints(1, msg.user)
+										break;
+								}
+							}
+						}
+					}
 				}
 			}
-		}
-
-		if (numberfound == 25 && gametype == "collab") {
-			numberfound = 26;
-			ws.send("!say SingsNote Vous avez tout trouvé SingsNote ! Bravo ! Et " + singlewin.length + " personnes ont trouvé l'artiste de la pochette ! PogChamp");
 		}
 
 		if (gametype == 'gus') {
 			if (!isNaN(msg.content) && ready) {
 				if (msg.content >= 0 && msg.content < 500) {
-					const duplicate = x => x.user.toString() === msg.user.toString().toString()
+					const duplicate = x => x.user.toString() === msg.user
 					if (gus.findIndex(duplicate) >= 0) {
 						gus.splice(gus.findIndex(duplicate), 1);
 					}
-					gus.push({ 'user': msg.user.toString().toString(), 'minutes': parseInt(msg.content, 10) });
+					gus.push({ 'user': msg.user, 'minutes': parseInt(msg.content, 10) });
 				}
 			}
 		}
 
-		if(gametype == "djviewers")
-		{
-			if(!isNaN(parseInt(msg.content)) && songfound == false)
-			{
+		if (gametype == "djviewers") {
+			if (!isNaN(parseInt(msg.content)) && songfound == false) {
 				var sample = parseInt(msg.content);
-				if(sample >= 0 && (sample <= songlist.find(x => x.listname === liste).songs[songindex].samples))
-				{
+				if (sample >= 0 && (sample <= songlist.find(x => x.listname === liste).songs[songindex].samples)) {
 					djviewers[songindex][sample].play();
+				}
+			}
+		}
+	}
+	else if (gametype == 'sel' && ready) {
+
+		addChat(msg.user, msg.content, "", "yes");
+		if (!selstop) {
+			const duplicate = x => x.user.toString() === msg.user
+			if (seloupoivre.findIndex(duplicate) >= 0) {
+				console.log("déjà trouvé");
+			}
+			else {
+				if (msg.content.toUpperCase() == "SEL" || msg.content.toUpperCase() == "S" || msg.content == "1") {
+					seloupoivre.push({ 'user': msg.user, 'answer': 'sel' });
+				}
+				else if (msg.content.toUpperCase() == "POIVRE" || msg.content.toUpperCase() == "P" || msg.content == "2") {
+					seloupoivre.push({ 'user': msg.user, 'answer': 'poivre' });
 				}
 			}
 		}
@@ -733,7 +776,6 @@ ws.onmessage = function (event) {
 	else if (gametype == "double" && ready == true) {
 		addChat(msg.user, msg.content, "", "yes");
 		if (songfound == false && songindex >= 0) {
-
 
 			for (var i = 0; i < 2; i++) {
 				var inf = songlist.find(x => x.listname === liste).songs[songindex].info[i].name;
@@ -888,7 +930,7 @@ ws.onmessage = function (event) {
 	else if (gametype == 'sel') {
 		addChat(msg.user, msg.content, "", "yes");
 
-	}	
+	}
 	else addChat(msg.user, msg.content, "", "no");
 	redraw();
 };
@@ -915,7 +957,7 @@ function drawTitle() {
 	ctx.font = '20px Trebuchet MS';
 	ctx.fillText(subtitle, x / 2 - ctx.measureText(subtitle).width / 2, 80);
 
-	if (gametype == "single" || gametype == "double" || gametype == "trivial" || gametype == "year" || gametype == "gus" || gametype == "djviewers") {
+	if (gametype == "single" || gametype == "double" || gametype == "trivial" || gametype == "year" || gametype == "gus" || gametype == "djviewers" || gametype == "sel") {
 		ctx.font = '40px Trebuchet MS';
 		var tot = songlist.find(x => x.listname === liste).songs.length;
 		ctx.fillText((songindex + 1) + "/" + tot, x / 2 - 700, 68);
@@ -983,7 +1025,18 @@ function drawSingleLose() {
 
 function drawDoubleTags() {
 	ctx.fillStyle = "white";
-	ctx.fillText("2 informations à trouver :", x / 2 - 400 - ctx.measureText("2 informations à trouver :").width / 2, 160);
+	if (songindex >= 0) {
+		if (songlist.find(x => x.listname === liste).songs[songindex].singletext != undefined) {
+			ctx.font = '40px Trebuchet MS';
+			ctx.fillStyle = "yellow";
+			ctx.fillText(songlist.find(x => x.listname === liste).songs[songindex].singletext, x / 2 - 400 - ctx.measureText(songlist.find(x => x.listname === liste).songs[songindex].singletext).width / 2, 160);
+			ctx.font = '20px Trebuchet MS';
+			ctx.fillStyle = "white";
+		}
+	}
+	else
+		ctx.fillText("2 informations à trouver :", x / 2 - 400 - ctx.measureText("2 informations à trouver :").width / 2, 160);
+
 	var info1 = songlist.find(x => x.listname === liste).info1;
 	var info2 = songlist.find(x => x.listname === liste).info2;
 	if (info1found == false) ctx.fillText(info1, x / 2 - 400 - ctx.measureText(info1).width / 2, 190);
@@ -1059,7 +1112,7 @@ function drawWinImage() {
 		var hRatio = 380 / img.width;
 		var vRatio = 555 / img.height;
 
-		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus') {
+		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus' || gametype == 'sel') {
 			var vRatio = 380 / img.height;
 		}
 
@@ -1068,7 +1121,7 @@ function drawWinImage() {
 		var xoffset = 0;
 		var yoffset = 0;
 		if (ratio == hRatio) {
-			if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus') {
+			if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus' || gametype == 'sel') {
 				yoffset = Math.round((380 - img.height * ratio) / 2);
 			}
 			else {
@@ -1082,7 +1135,7 @@ function drawWinImage() {
 		ctx.fillStyle = 'white';
 		ctx.strokeStyle = 'white';
 
-		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus') {
+		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus' || gametype == 'sel') {
 			ctx.drawImage(img, 0, 0, img.width, img.height, x / 2 - 400 + xoffset, 515 + yoffset, img.width * ratio, img.height * ratio);
 			if (hint && !songfound) {
 				ctx.drawImage(hintpic[hintreveal], x / 2 - 400, 515, 380, 380);
@@ -1263,14 +1316,6 @@ function redraw() {
 		}
 	}
 
-	if (visiblepoints || visibletotalpoints) {
-		displayPoints();
-	}
-
-	if (visibletheme) {
-		displayThemes();
-	}
-
 	if (visiblebonus) {
 		displayBonus();
 	}
@@ -1283,16 +1328,27 @@ function redraw() {
 		drawWinImage();
 	}
 
-	if (visibleyear) {
+	if (gametype == 'year') {
 		displayYears();
 	}
 
-	if (visiblesel) {
+	if (gametype == 'sel') {
 		displaySel();
-	}	
+	}
 
-	if (visiblegus) {
+	if (gametype == 'gus') {
 		displayGus();
+	}
+
+	if (visibletheme) {
+		displayThemes();
+	}
+
+	if (visiblecollabpoints)
+		displayCollabPoints();
+
+	if (visiblepoints || visibletotalpoints) {
+		displayPoints();
 	}
 }
 
@@ -1324,7 +1380,7 @@ function addPoints(amount, user) {
 		}
 	}
 
-	if (!liste.includes("exemple")){
+	if (!liste.includes("exemple")) {
 		if (totalpoints.find(x => x.user === user) != undefined) {
 			totalpoints.find(x => x.user === user).points = totalpoints.find(x => x.user === user).points + amount;
 		}
@@ -1409,163 +1465,323 @@ function displayPoints() {
 	}
 }
 
-function displaySel(){
-	if (visiblesel) {
+function displayCollabPoints() {
 
+	ctx.strokeStyle = "orange";
+	ctx.fillStyle = "black";
+
+	var width = 0;
+	for (var i = 0; i < tbfcollab.length; i++) {
+		var curwidth = 0;
+		curwidth = ctx.measureText(tbfcollab[i].name + " : ").width;
+		if (tbfcollab[i].found) {
+			for (var j = 0; j < collabfound[i].length; j++)
+			{
+				curwidth += ctx.measureText(collabfound[i][j].user + "(" + collabfound[i][j].time / 100 + "s)").width;
+			}
+			
+		}
+		if (curwidth > width)
+		{
+			width = curwidth
+		}
+	}
+
+	roundRect(ctx, x / 2 - 400 - width / 2, 60, width, 836, 20, true);
+	ctx.font = '40px Trebuchet MS';
+	ctx.fillStyle = ctx.strokeStyle;
+	ctx.fillText("Les Temps", x / 2 - 400 - ctx.measureText("Les Temps").width / 2, 100);
+	ctx.font = '18px Trebuchet MS';
+
+	for (var i = 0; i < tbfcollab.length; i++) {
+
+		ctx.fillStyle = "white"
+		ctx.fillText(tbfcollab[i].name + " : ", x / 2  - 400 - width / 2 + 10 , 150 + 30 * i)
+
+		if (tbfcollab[i].found) {
+			var txtx = ctx.measureText(tbfcollab[i].name + " : ").width;
+			for (var j = 0; j < collabfound[i].length; j++)
+			{
+				ctx.fillStyle = getUserColor(collabfound[i][j].user);
+				ctx.fillText(collabfound[i][j].user, x / 2 - 400 - width / 2 + 10 + txtx, 150 + 30 * i)
+				txtx+=ctx.measureText(collabfound[i][j].user).width;
+				ctx.fillStyle = "white";
+				ctx.fillText("(" + collabfound[i][j].time / 100 + "s) ", x / 2 - 400 - width / 2 + 10 + txtx, 150 + 30 * i)
+				txtx +=ctx.measureText("(" + collabfound[i][j].time / 100 + "s) ").width;
+			}
+		}
+	}
+}
+
+function displaySel() {
+
+	drawCadre("white");
+	drawCadre("white", 130, 70);
+	ctx.font = '30px Trebuchet MS';
+
+	ctx.fillStyle = "yellow";
+
+	var question = "Ici il y aura une question !";
+
+	if (songindex >= 0)
+		question = songlist.find(x => x.listname === liste).songs[songindex].question;
+
+	var fontsize = 30;
+
+	while (ctx.measureText(question).width > 760) {
+		fontsize = fontsize - 2;
+		ctx.font = fontsize.toString() + "px Trebuchet MS";
+	}
+
+	ctx.fillText(question, x / 2 - 400 - ctx.measureText(question).width / 2, 165);
+
+	ctx.font = '30px Trebuchet MS';
+
+
+	var questionsel = "Proposition Sel";
+	if (songindex >= 0)
+		questionsel = songlist.find(x => x.listname === liste).songs[songindex].sel;
+
+
+	var questionpoivre = "Proposition Poivre"
+	if (songindex >= 0)
+		questionpoivre = songlist.find(x => x.listname === liste).songs[songindex].poivre;
+
+	ctx.fillStyle = "white";
+	roundRect(ctx, x / 2 - 800, 190, 390, 130, 20, false);
+	roundRect(ctx, x / 2 - 800 + 390, 190, 390, 130, 20, false);
+
+	ctx.fillText("Sel", x / 2 - 400 - ctx.measureText("Sel").width / 2 - 760 / 4, 230);
+	ctx.fillText(questionsel, x / 2 - 400 - ctx.measureText(questionsel).width / 2 - 760 / 4, 280);
+
+	ctx.fillStyle = "grey";
+	ctx.fillText("Poivre", x / 2 - 400 - ctx.measureText("Poivre").width / 2 + 760 / 4, 230);
+	ctx.fillText(questionpoivre, x / 2 - 400 - ctx.measureText(questionpoivre).width / 2 + 760 / 4, 280);
+
+	ctx.fillStyle = "white";
+
+
+	var maxheight = 6;
+	var column = 1 + Math.trunc((seloupoivre.length - 1) / maxheight);
+
+	var hpoints = 90 + seloupoivre.length * 25;
+	if (seloupoivre.length > maxheight) {
+		hpoints = 90 + maxheight * 25
+	}
+
+	ctx.clearRect(x / 2 - 800, 120 + 200, 780, 195);
+
+	ctx.fillStyle = bg;
+	ctx.strokeStyle = "pink";
+
+	roundRect(ctx, x / 2 - 800, 120 + 200, 780, 195, 20, true);
+
+	var ans = "ans"
+	if (songindex >= 0)
+		ans = songlist.find(x => x.listname === liste).songs[songindex].answer;
+
+	ctx.font = '30px Trebuchet MS';
+	ctx.fillStyle = ctx.strokeStyle;
+
+	if (!selstop) {
+		ctx.fillText("Sel ou Poivre", x / 2 - 400 - ctx.measureText("Sel ou Poivre").width / 2, 350);
+	}
+	else {
+		ctx.fillText("Réponse : " + ans, x / 2 - 400 - ctx.measureText("Réponse : " + ans).width / 2, 350);
+	}
+
+	ctx.font = '18px Trebuchet MS';
+	for (var i = 0; i < seloupoivre.length; i++) {
+		var curcol = 1 + Math.trunc(i / maxheight);
+		var colx = 0;
+		colx = 200 * curcol - 100 - 200 * (column / 2);
+		var curi = i % maxheight;
+
+		var usr = seloupoivre[i].user;
+		var usrans = seloupoivre[i].answer;
+
+		var wmin = ctx.measureText(usr + " - " + "P").width;
+
+		ctx.fillStyle = getUserColor(usr);
+		ctx.fillText(usr, x / 2 - 400 + colx - wmin / 2, 320 - hpoints / 2 + 180 + curi * 25);
+
+		ctx.fillStyle = "white";
+		var emoji;
+
+		if (usrans == 'sel') {
+			emoji = "Sel"
+		}
+		else {
+			emoji = "Poivre"
+		}
+
+		if (selstop) {
+			ctx.strokeStyle = "green";
+			if (ans == "sel") {
+				roundRect(ctx, x / 2 - 800, 190, 390, 130, 20, false);
+			}
+			else {
+				roundRect(ctx, x / 2 - 800 + 390, 190, 390, 130, 20, false);
+			}
+
+			if (ans == usrans) {
+				ctx.fillStyle = "green";
+			}
+			else {
+				ctx.fillStyle = "red";
+			}
+		}
+		ctx.fillText(" " + emoji, x / 2 - 400 + colx - wmin / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 180 + curi * 25);
 	}
 }
 
 function displayYears() {
-	if (visibleyear) {
-		var maxheight = 12;
-		var column = 1 + Math.trunc((years.length - 1) / maxheight);
+	var maxheight = 12;
+	var column = 1 + Math.trunc((years.length - 1) / maxheight);
 
-		var hpoints = 90 + years.length * 25;
-		if (years.length > maxheight) {
-			hpoints = 90 + maxheight * 25
-		}
-		var wpoints = 300 * column;
-
-		ctx.clearRect(x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints);
-
-		ctx.fillStyle = bg;
-		ctx.strokeStyle = "pink";
-
-		roundRect(ctx, x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints, 20, true);
-
-		ctx.font = '40px Trebuchet MS';
-		ctx.fillStyle = ctx.strokeStyle;
-
-		var ansyear = parseInt(songlist.find(x => x.listname === liste).songs[songindex].name);
-
-		if (!songfound) {
-			ctx.fillText("Années", x / 2 - 400 - ctx.measureText("Années").width / 2, 320 - hpoints / 2 + 50);
-		}
-		else {
-			ctx.fillText("Réponse : " + ansyear, x / 2 - 400 - ctx.measureText("Réponse : " + ansyear).width / 2, 320 - hpoints / 2 + 50);
-		}
-
-		ctx.font = '18px Trebuchet MS';
-
-		for (var i = 0; i < years.length; i++) {
-			var curcol = 1 + Math.trunc(i / maxheight);
-			var colx = 0;
-			colx = 300 * curcol - 150 - 300 * (column / 2);
-			var curi = i % maxheight;
-
-			var usr = years[i].user;
-			var yea = years[i].year;
-
-			var wyea = ctx.measureText(usr + " - " + yea).width;
-
-			ctx.fillStyle = getUserColor(usr);
-			ctx.fillText(usr, x / 2 - 400 + colx - wyea / 2, 320 - hpoints / 2 + 90 + curi * 25);
-
-			ctx.fillStyle = "white";
-			var medal = " ";
-			if (songfound) {
-				if (yea == ansyear) {
-					ctx.fillStyle = "green";
-					medal = "🥇";
-				}
-				else if (Math.abs(yea - ansyear) == 1) {
-					ctx.fillStyle = "yellow";
-					medal = "🥈";
-				}
-				else if (Math.abs(yea - ansyear) == 2) {
-					ctx.fillStyle = "orange";
-					medal = "🥉";
-				}
-				else {
-					ctx.fillStyle = "red";
-				}
-			}
-			ctx.fillText(medal + yea, x / 2 - 400 + colx - wyea / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 90 + curi * 25);
-
-		}
-		ctx.fillStyle = "white";
-		ctx.strokeStyle = "white";
-		ctx.font = '20px Trebuchet MS';
+	var hpoints = 90 + years.length * 25;
+	if (years.length > maxheight) {
+		hpoints = 90 + maxheight * 25
 	}
+	var wpoints = 300 * column;
+
+	ctx.clearRect(x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints);
+
+	ctx.fillStyle = bg;
+	ctx.strokeStyle = "pink";
+
+	roundRect(ctx, x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints, 20, true);
+
+	ctx.font = '40px Trebuchet MS';
+	ctx.fillStyle = ctx.strokeStyle;
+
+	var ansyear = -1;
+
+	if (songindex >= 0)
+		ansyear = parseInt(songlist.find(x => x.listname === liste).songs[songindex].name);
+
+	if (!songfound) {
+		ctx.fillText("Années", x / 2 - 400 - ctx.measureText("Années").width / 2, 320 - hpoints / 2 + 50);
+	}
+	else {
+		ctx.fillText("Réponse : " + ansyear, x / 2 - 400 - ctx.measureText("Réponse : " + ansyear).width / 2, 320 - hpoints / 2 + 50);
+	}
+
+	ctx.font = '18px Trebuchet MS';
+
+	for (var i = 0; i < years.length; i++) {
+		var curcol = 1 + Math.trunc(i / maxheight);
+		var colx = 0;
+		colx = 300 * curcol - 150 - 300 * (column / 2);
+		var curi = i % maxheight;
+
+		var usr = years[i].user;
+		var yea = years[i].year;
+
+		var wyea = ctx.measureText(usr + " - " + yea).width;
+
+		ctx.fillStyle = getUserColor(usr);
+		ctx.fillText(usr, x / 2 - 400 + colx - wyea / 2, 320 - hpoints / 2 + 90 + curi * 25);
+
+		ctx.fillStyle = "white";
+		var medal = " ";
+		if (songfound) {
+			if (yea == ansyear) {
+				ctx.fillStyle = "green";
+				medal = "🥇";
+			}
+			else if (Math.abs(yea - ansyear) == 1) {
+				ctx.fillStyle = "yellow";
+				medal = "🥈";
+			}
+			else if (Math.abs(yea - ansyear) == 2) {
+				ctx.fillStyle = "orange";
+				medal = "🥉";
+			}
+			else {
+				ctx.fillStyle = "red";
+			}
+		}
+		ctx.fillText(medal + yea, x / 2 - 400 + colx - wyea / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 90 + curi * 25);
+
+	}
+	ctx.fillStyle = "white";
+	ctx.strokeStyle = "white";
+	ctx.font = '20px Trebuchet MS';
 }
 
 function displayGus() {
-	if (visiblegus) {
-		var maxheight = 6;
-		var column = 1 + Math.trunc((gus.length - 1) / maxheight);
+	var maxheight = 6;
+	var column = 1 + Math.trunc((gus.length - 1) / maxheight);
 
-		var hpoints = 90 + gus.length * 25;
-		if (gus.length > maxheight) {
-			hpoints = 90 + maxheight * 25
-		}
+	var hpoints = 90 + gus.length * 25;
+	if (gus.length > maxheight) {
+		hpoints = 90 + maxheight * 25
+	}
 
-		ctx.clearRect(x / 2 - 800, 120 + 200, 780, 195);
+	ctx.clearRect(x / 2 - 800, 120 + 200, 780, 195);
 
-		ctx.fillStyle = bg;
-		ctx.strokeStyle = "pink";
+	ctx.fillStyle = bg;
+	ctx.strokeStyle = "pink";
 
-		roundRect(ctx, x / 2 - 800, 120 + 200, 780, 195, 20, true);
+	roundRect(ctx, x / 2 - 800, 120 + 200, 780, 195, 20, true);
 
-		var ansmin = parseInt(songlist.find(x => x.listname === liste).songs[songindex].minutes);
+	var ansmin = -1;
 
-		ctx.font = '30px Trebuchet MS';
-		ctx.fillStyle = ctx.strokeStyle;
-		if (!gusstop) {
-			ctx.fillText("# Albums", x / 2 - 400 - ctx.measureText("# Albums").width / 2, 350);
+	if (songindex >= 0)
+		ansmin = parseInt(songlist.find(x => x.listname === liste).songs[songindex].minutes);
+
+	ctx.font = '30px Trebuchet MS';
+	ctx.fillStyle = ctx.strokeStyle;
+	if (!gusstop) {
+		ctx.fillText("Nombres d'albums studio ?", x / 2 - 400 - ctx.measureText("Nombres d'albums studio ?").width / 2, 350);
+	}
+	else {
+		if (ansmin == 1) {
+			ctx.fillText("Réponse : " + ansmin + " album", x / 2 - 400 - ctx.measureText("Réponse : " + ansmin + " album").width / 2, 350);
 		}
 		else {
-			if (ansmin == 1)
-			{
-				ctx.fillText("Réponse : " + ansmin + "  album", x / 2 - 400 - ctx.measureText("Réponse : " + ansmin + " album").width / 2, 350);
-			}
-			else
-			{
-				ctx.fillText("Réponse : " + ansmin + "  albums", x / 2 - 400 - ctx.measureText("Réponse : " + ansmin + " albums").width / 2, 350);
-			}
+			ctx.fillText("Réponse : " + ansmin + " albums", x / 2 - 400 - ctx.measureText("Réponse : " + ansmin + " albums").width / 2, 350);
 		}
-
-		ctx.font = '18px Trebuchet MS';
-
-		for (var i = 0; i < gus.length; i++) {
-			var curcol = 1 + Math.trunc(i / maxheight);
-			var colx = 0;
-			colx = 200 * curcol - 100 - 200 * (column / 2);
-			var curi = i % maxheight;
-
-			var usr = gus[i].user;
-			var min = gus[i].minutes;
-
-			var wmin = ctx.measureText(usr + " - " + min).width;
-
-			ctx.fillStyle = getUserColor(usr);
-			ctx.fillText(usr, x / 2 - 400 + colx - wmin / 2, 320 - hpoints / 2 + 180 + curi * 25);
-
-			ctx.fillStyle = "white";
-			var medal = " ";
-
-			if (gusstop) {
-				if (min == ansmin) {
-					ctx.fillStyle = "green";
-					medal = "🥇";
-				}
-				else if (Math.abs(min - ansmin) >= 1 && Math.abs(min - ansmin) <= 2) {
-					ctx.fillStyle = "yellow";
-					medal = "🥈";
-				}
-				else if (Math.abs(min - ansmin) > 2 && Math.abs(min - ansmin) <= 5) {
-					ctx.fillStyle = "orange";
-					medal = "🥉";
-				}
-				else {
-					ctx.fillStyle = "red";
-				}
-			}
-			ctx.fillText(medal + min, x / 2 - 400 + colx - wmin / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 180 + curi * 25);
-		}
-		ctx.fillStyle = "white";
-		ctx.strokeStyle = "white";
-		ctx.font = '20px Trebuchet MS';
 	}
+
+	ctx.font = '18px Trebuchet MS';
+
+	for (var i = 0; i < gus.length; i++) {
+		var curcol = 1 + Math.trunc(i / maxheight);
+		var colx = 0;
+		colx = 200 * curcol - 100 - 200 * (column / 2);
+		var curi = i % maxheight;
+
+		var usr = gus[i].user;
+		var min = gus[i].minutes;
+
+		var wmin = ctx.measureText(usr + " - " + min).width;
+
+		ctx.fillStyle = getUserColor(usr);
+		ctx.fillText(usr, x / 2 - 400 + colx - wmin / 2, 320 - hpoints / 2 + 180 + curi * 25);
+
+		ctx.fillStyle = "white";
+		var medal = " ";
+
+		if (gusstop) {
+			if (min == ansmin) {
+				ctx.fillStyle = "green";
+				medal = "🥇";
+			}
+			else if (Math.abs(min - ansmin) >= 1 && Math.abs(min - ansmin) <= 3) {
+				ctx.fillStyle = "yellow";
+				medal = "🥈";
+			}
+			else {
+				ctx.fillStyle = "red";
+			}
+		}
+		ctx.fillText(medal + min, x / 2 - 400 + colx - wmin / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 180 + curi * 25);
+	}
+	ctx.fillStyle = "white";
+	ctx.strokeStyle = "white";
+	ctx.font = '20px Trebuchet MS';
 }
 
 function giveYearPoints(year) {
@@ -1595,12 +1811,12 @@ function giveYearPoints(year) {
 }
 
 function giveGusPoints(minutes) {
-	var bonus = 3;
+	var bonus = 2;
 	for (var i = 0; i < gus.length; i++) {
 		if (gus[i].minutes == minutes) {
-			addPoints(3 + bonus, gus[i].user);
+			addPoints(2 + bonus, gus[i].user);
 			if (bonus > 0) {
-				ws.send("!say Bravo " + gus[i].user + ", 3 points bonus pour toi !");
+				ws.send("!say Bravo " + gus[i].user + ", 2 points bonus pour toi !");
 				bonus = 0;
 
 				if (tokens.find(x => x.user === gus[i].user) == undefined) {
@@ -1611,13 +1827,50 @@ function giveGusPoints(minutes) {
 				}
 			}
 		}
-		else if (Math.abs(gus[i].minutes - minutes) >= 1 && Math.abs(gus[i].minutes - minutes) <= 2) {
-			addPoints(2, gus[i].user);
-		}
-		else if (Math.abs(gus[i].minutes - minutes) > 2 && Math.abs(gus[i].minutes - minutes) <= 5) {
+		else if (Math.abs(gus[i].minutes - minutes) >= 1 && Math.abs(gus[i].minutes - minutes) <= 3) {
 			addPoints(1, gus[i].user);
 		}
 	}
+}
+
+function giveSelPoints(answer) {
+	var bonus = 6;
+	var sayresult = "";
+	var atleastone = false;
+
+	for (var i = 0; i < seloupoivre.length; i++) {
+
+		if (seloupoivre[i].answer == answer) {
+			atleastone = true;
+			switch (bonus) {
+				case 6:
+					sayresult += "3 points" + " pour : "
+				case 5:
+					sayresult += seloupoivre[i].user + ", "
+					addPoints(3, seloupoivre[i].user);
+					bonus--;
+					break;
+				case 4:
+					sayresult += "2 points" + " pour : "
+				case 3:
+					sayresult += seloupoivre[i].user + ", "
+					addPoints(2, seloupoivre[i].user);
+					bonus--;
+					break;
+				case 2:
+					sayresult += "1 point" + " pour : "
+					bonus--;
+				case 1:
+					sayresult += seloupoivre[i].user + ", "
+					addPoints(1, seloupoivre[i].user);
+					break;
+				default:
+			}
+		}
+	}
+
+	if (atleastone)
+		ws.send("!say " + sayresult + " Bravo !")
 }
 
 function drawCollab() {
@@ -1638,12 +1891,19 @@ function fillCollab() {
 		var x0 = x / 2 - 780;
 		var y0 = 135;
 
-		if (tbfcollab[i].found == 'false') {
+		if (!tbfcollab[i].found) {
 			var rank = tbfcollab[i].rank;
 			ctx.drawImage(collabblank[rank], x0 + rank % 5 * 150, y0 + Math.trunc(rank / 5) * 150, 150, 150);
 		}
 	}
 	drawCollab();
+
+	if (!ready) {
+		ctx.font = '40px Trebuchet MS';
+		ctx.clearRect(x / 2 - 750, 20, 150, 50);
+		ctx.fillText(collabtime / 100 + "s", x / 2 - 750, 68);
+		ctx.font = '20px Trebuchet MS';
+	}
 }
 
 function preloadHint() {
@@ -1676,18 +1936,16 @@ function preloadMulti() {
 	}
 }
 
-function preloadDJ(length)
-{
+function preloadDJ(length) {
 
-    //for f in *.mp3; do fold=$(echo $f | awk '{print $3}'); mkdir $fold; ffmpeg -i "$f" -f segment -segment_time 1 -c copy $fold/%01d.mp3; for result in $fold/*.mp3; do ffmpeg -y -i "$result" -af "afade=t=in:st=0:d=0.1" -hide_banner -loglevel panic "$result"; done; done
+	//for f in *.mp3; do fold=$(echo $f | awk '{print $3}'); mkdir $fold; ffmpeg -i "$f" -f segment -segment_time 1 -c copy $fold/%01d.mp3; for result in $fold/*.mp3; do ffmpeg -y -i "$result" -af "afade=t=in:st=0:d=0.1" -hide_banner -loglevel panic "$result"; done; done
 
 	for (var i = 0; i < length; i++) {
 		if (!djviewers[i]) djviewers[i] = [];
-		for (var j = 0; j < songlist.find(x => x.listname === liste).songs[i].samples; j++)
-			{
-				djviewers[i][j] = new Audio();
-				djviewers[i][j].src = "./djviewers/"+liste+"/"+i+"/"+j+".mp3";
-			}		
+		for (var j = 0; j < songlist.find(x => x.listname === liste).songs[i].samples; j++) {
+			djviewers[i][j] = new Audio();
+			djviewers[i][j].src = "./djviewers/" + liste + "/" + i + "/" + j + ".mp3";
+		}
 	}
 }
 
@@ -1755,8 +2013,7 @@ function displayBonus() {
 				if (bonusletters.some(item => item.letter === bonusprop[i].letter)) {
 					ctx.fillStyle = "green";
 				}
-				else
-				{
+				else {
 					ctx.fillStyle = "white";
 				}
 				if (bonusprop[i].user != 'fill') {
@@ -1960,6 +2217,7 @@ function resetvisibles() {
 	visibleyear = false;
 	visiblesel = false;
 	visiblegus = false;
+	visiblecollabpoints = false;
 	//visiblebonus = false;
 }
 
@@ -2017,6 +2275,18 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 }
 
 setInterval(function () {
+
+	if (ready && gametype == 'collab') {
+
+		ctx.font = '40px Trebuchet MS';
+		ctx.clearRect(x / 2 - 750, 20, 150, 50);
+		ctx.fillText(collabtime / 100 + "s", x / 2 - 750, 68);
+		ctx.font = '20px Trebuchet MS';
+
+		collabtime += 1;
+	}
+
+
 	if (countdown > 0) {
 		if (countdown % 100 == 0) {
 			ws.send("!say " + countdown / 100 + "...");
@@ -2024,9 +2294,25 @@ setInterval(function () {
 		countdown--;
 	}
 
+	if (countdownsel > 0 && ready) {
+		if (countdownsel % 100 == 0) {
+			ws.send("!say ⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳   " + countdownsel / 100 + "... ⏳⏳⏳⏳⏳⏳⏳⏳⏳⏳");
+		}
+		countdownsel--;
+	}
+
+
 	if (!loadedhint) {
 		preloadHint();
 		loadedhint = true;
+	}
+
+	if (countdownsel == 0 && ready && !selstop) {
+		ws.send("!say 🛑🛑STOOOOOOOOOOOOOOP🛑🛑")
+		selstop = true;
+		giveSelPoints(songlist.find(x => x.listname === liste).songs[songindex].answer);
+		visiblewin = true;
+		redraw();
 	}
 
 	if (countdown == 0 && ready == false) {
@@ -2069,14 +2355,18 @@ setInterval(function () {
 
 		var lgth = songlist.find(x => x.listname === liste).songs.length;
 		var sample = songlist.find(x => x.listname === liste).songs[lgth - 1].samples;
-		if (djviewers[lgth - 1][sample - 1].readyState == 4)
-		{
+		if (djviewers[lgth - 1][sample - 1].readyState == 4) {
 			singletext = "Toutes les chansons ont été chargées !";
 			redraw();
 		}
 		else {
 			singletext = "Chargement des chansons en cours...";
 			redraw();
-		}			
-	}	
+		}
+	}
 }, 10);
+
+var Latinise = {}; Latinise.latin_map = { "Á": "A", "Ă": "A", "Ắ": "A", "Ặ": "A", "Ằ": "A", "Ẳ": "A", "Ẵ": "A", "Ǎ": "A", "Â": "A", "Ấ": "A", "Ậ": "A", "Ầ": "A", "Ẩ": "A", "Ẫ": "A", "Ä": "A", "Ǟ": "A", "Ȧ": "A", "Ǡ": "A", "Ạ": "A", "Ȁ": "A", "À": "A", "Ả": "A", "Ȃ": "A", "Ā": "A", "Ą": "A", "Å": "A", "Ǻ": "A", "Ḁ": "A", "Ⱥ": "A", "Ã": "A", "Ꜳ": "AA", "Æ": "AE", "Ǽ": "AE", "Ǣ": "AE", "Ꜵ": "AO", "Ꜷ": "AU", "Ꜹ": "AV", "Ꜻ": "AV", "Ꜽ": "AY", "Ḃ": "B", "Ḅ": "B", "Ɓ": "B", "Ḇ": "B", "Ƀ": "B", "Ƃ": "B", "Ć": "C", "Č": "C", "Ç": "C", "Ḉ": "C", "Ĉ": "C", "Ċ": "C", "Ƈ": "C", "Ȼ": "C", "Ď": "D", "Ḑ": "D", "Ḓ": "D", "Ḋ": "D", "Ḍ": "D", "Ɗ": "D", "Ḏ": "D", "ǲ": "D", "ǅ": "D", "Đ": "D", "Ƌ": "D", "Ǳ": "DZ", "Ǆ": "DZ", "É": "E", "Ĕ": "E", "Ě": "E", "Ȩ": "E", "Ḝ": "E", "Ê": "E", "Ế": "E", "Ệ": "E", "Ề": "E", "Ể": "E", "Ễ": "E", "Ḙ": "E", "Ë": "E", "Ė": "E", "Ẹ": "E", "Ȅ": "E", "È": "E", "Ẻ": "E", "Ȇ": "E", "Ē": "E", "Ḗ": "E", "Ḕ": "E", "Ę": "E", "Ɇ": "E", "Ẽ": "E", "Ḛ": "E", "Ꝫ": "ET", "Ḟ": "F", "Ƒ": "F", "Ǵ": "G", "Ğ": "G", "Ǧ": "G", "Ģ": "G", "Ĝ": "G", "Ġ": "G", "Ɠ": "G", "Ḡ": "G", "Ǥ": "G", "Ḫ": "H", "Ȟ": "H", "Ḩ": "H", "Ĥ": "H", "Ⱨ": "H", "Ḧ": "H", "Ḣ": "H", "Ḥ": "H", "Ħ": "H", "Í": "I", "Ĭ": "I", "Ǐ": "I", "Î": "I", "Ï": "I", "Ḯ": "I", "İ": "I", "Ị": "I", "Ȉ": "I", "Ì": "I", "Ỉ": "I", "Ȋ": "I", "Ī": "I", "Į": "I", "Ɨ": "I", "Ĩ": "I", "Ḭ": "I", "Ꝺ": "D", "Ꝼ": "F", "Ᵹ": "G", "Ꞃ": "R", "Ꞅ": "S", "Ꞇ": "T", "Ꝭ": "IS", "Ĵ": "J", "Ɉ": "J", "Ḱ": "K", "Ǩ": "K", "Ķ": "K", "Ⱪ": "K", "Ꝃ": "K", "Ḳ": "K", "Ƙ": "K", "Ḵ": "K", "Ꝁ": "K", "Ꝅ": "K", "Ĺ": "L", "Ƚ": "L", "Ľ": "L", "Ļ": "L", "Ḽ": "L", "Ḷ": "L", "Ḹ": "L", "Ⱡ": "L", "Ꝉ": "L", "Ḻ": "L", "Ŀ": "L", "Ɫ": "L", "ǈ": "L", "Ł": "L", "Ǉ": "LJ", "Ḿ": "M", "Ṁ": "M", "Ṃ": "M", "Ɱ": "M", "Ń": "N", "Ň": "N", "Ņ": "N", "Ṋ": "N", "Ṅ": "N", "Ṇ": "N", "Ǹ": "N", "Ɲ": "N", "Ṉ": "N", "Ƞ": "N", "ǋ": "N", "Ñ": "N", "Ǌ": "NJ", "Ó": "O", "Ŏ": "O", "Ǒ": "O", "Ô": "O", "Ố": "O", "Ộ": "O", "Ồ": "O", "Ổ": "O", "Ỗ": "O", "Ö": "O", "Ȫ": "O", "Ȯ": "O", "Ȱ": "O", "Ọ": "O", "Ő": "O", "Ȍ": "O", "Ò": "O", "Ỏ": "O", "Ơ": "O", "Ớ": "O", "Ợ": "O", "Ờ": "O", "Ở": "O", "Ỡ": "O", "Ȏ": "O", "Ꝋ": "O", "Ꝍ": "O", "Ō": "O", "Ṓ": "O", "Ṑ": "O", "Ɵ": "O", "Ǫ": "O", "Ǭ": "O", "Ø": "O", "Ǿ": "O", "Õ": "O", "Ṍ": "O", "Ṏ": "O", "Ȭ": "O", "Ƣ": "OI", "Ꝏ": "OO", "Ɛ": "E", "Ɔ": "O", "Ȣ": "OU", "Ṕ": "P", "Ṗ": "P", "Ꝓ": "P", "Ƥ": "P", "Ꝕ": "P", "Ᵽ": "P", "Ꝑ": "P", "Ꝙ": "Q", "Ꝗ": "Q", "Ŕ": "R", "Ř": "R", "Ŗ": "R", "Ṙ": "R", "Ṛ": "R", "Ṝ": "R", "Ȑ": "R", "Ȓ": "R", "Ṟ": "R", "Ɍ": "R", "Ɽ": "R", "Ꜿ": "C", "Ǝ": "E", "Ś": "S", "Ṥ": "S", "Š": "S", "Ṧ": "S", "Ş": "S", "Ŝ": "S", "Ș": "S", "Ṡ": "S", "Ṣ": "S", "Ṩ": "S", "Ť": "T", "Ţ": "T", "Ṱ": "T", "Ț": "T", "Ⱦ": "T", "Ṫ": "T", "Ṭ": "T", "Ƭ": "T", "Ṯ": "T", "Ʈ": "T", "Ŧ": "T", "Ɐ": "A", "Ꞁ": "L", "Ɯ": "M", "Ʌ": "V", "Ꜩ": "TZ", "Ú": "U", "Ŭ": "U", "Ǔ": "U", "Û": "U", "Ṷ": "U", "Ü": "U", "Ǘ": "U", "Ǚ": "U", "Ǜ": "U", "Ǖ": "U", "Ṳ": "U", "Ụ": "U", "Ű": "U", "Ȕ": "U", "Ù": "U", "Ủ": "U", "Ư": "U", "Ứ": "U", "Ự": "U", "Ừ": "U", "Ử": "U", "Ữ": "U", "Ȗ": "U", "Ū": "U", "Ṻ": "U", "Ų": "U", "Ů": "U", "Ũ": "U", "Ṹ": "U", "Ṵ": "U", "Ꝟ": "V", "Ṿ": "V", "Ʋ": "V", "Ṽ": "V", "Ꝡ": "VY", "Ẃ": "W", "Ŵ": "W", "Ẅ": "W", "Ẇ": "W", "Ẉ": "W", "Ẁ": "W", "Ⱳ": "W", "Ẍ": "X", "Ẋ": "X", "Ý": "Y", "Ŷ": "Y", "Ÿ": "Y", "Ẏ": "Y", "Ỵ": "Y", "Ỳ": "Y", "Ƴ": "Y", "Ỷ": "Y", "Ỿ": "Y", "Ȳ": "Y", "Ɏ": "Y", "Ỹ": "Y", "Ź": "Z", "Ž": "Z", "Ẑ": "Z", "Ⱬ": "Z", "Ż": "Z", "Ẓ": "Z", "Ȥ": "Z", "Ẕ": "Z", "Ƶ": "Z", "Ĳ": "IJ", "Œ": "OE", "ᴀ": "A", "ᴁ": "AE", "ʙ": "B", "ᴃ": "B", "ᴄ": "C", "ᴅ": "D", "ᴇ": "E", "ꜰ": "F", "ɢ": "G", "ʛ": "G", "ʜ": "H", "ɪ": "I", "ʁ": "R", "ᴊ": "J", "ᴋ": "K", "ʟ": "L", "ᴌ": "L", "ᴍ": "M", "ɴ": "N", "ᴏ": "O", "ɶ": "OE", "ᴐ": "O", "ᴕ": "OU", "ᴘ": "P", "ʀ": "R", "ᴎ": "N", "ᴙ": "R", "ꜱ": "S", "ᴛ": "T", "ⱻ": "E", "ᴚ": "R", "ᴜ": "U", "ᴠ": "V", "ᴡ": "W", "ʏ": "Y", "ᴢ": "Z", "á": "a", "ă": "a", "ắ": "a", "ặ": "a", "ằ": "a", "ẳ": "a", "ẵ": "a", "ǎ": "a", "â": "a", "ấ": "a", "ậ": "a", "ầ": "a", "ẩ": "a", "ẫ": "a", "ä": "a", "ǟ": "a", "ȧ": "a", "ǡ": "a", "ạ": "a", "ȁ": "a", "à": "a", "ả": "a", "ȃ": "a", "ā": "a", "ą": "a", "ᶏ": "a", "ẚ": "a", "å": "a", "ǻ": "a", "ḁ": "a", "ⱥ": "a", "ã": "a", "ꜳ": "aa", "æ": "ae", "ǽ": "ae", "ǣ": "ae", "ꜵ": "ao", "ꜷ": "au", "ꜹ": "av", "ꜻ": "av", "ꜽ": "ay", "ḃ": "b", "ḅ": "b", "ɓ": "b", "ḇ": "b", "ᵬ": "b", "ᶀ": "b", "ƀ": "b", "ƃ": "b", "ɵ": "o", "ć": "c", "č": "c", "ç": "c", "ḉ": "c", "ĉ": "c", "ɕ": "c", "ċ": "c", "ƈ": "c", "ȼ": "c", "ď": "d", "ḑ": "d", "ḓ": "d", "ȡ": "d", "ḋ": "d", "ḍ": "d", "ɗ": "d", "ᶑ": "d", "ḏ": "d", "ᵭ": "d", "ᶁ": "d", "đ": "d", "ɖ": "d", "ƌ": "d", "ı": "i", "ȷ": "j", "ɟ": "j", "ʄ": "j", "ǳ": "dz", "ǆ": "dz", "é": "e", "ĕ": "e", "ě": "e", "ȩ": "e", "ḝ": "e", "ê": "e", "ế": "e", "ệ": "e", "ề": "e", "ể": "e", "ễ": "e", "ḙ": "e", "ë": "e", "ė": "e", "ẹ": "e", "ȅ": "e", "è": "e", "ẻ": "e", "ȇ": "e", "ē": "e", "ḗ": "e", "ḕ": "e", "ⱸ": "e", "ę": "e", "ᶒ": "e", "ɇ": "e", "ẽ": "e", "ḛ": "e", "ꝫ": "et", "ḟ": "f", "ƒ": "f", "ᵮ": "f", "ᶂ": "f", "ǵ": "g", "ğ": "g", "ǧ": "g", "ģ": "g", "ĝ": "g", "ġ": "g", "ɠ": "g", "ḡ": "g", "ᶃ": "g", "ǥ": "g", "ḫ": "h", "ȟ": "h", "ḩ": "h", "ĥ": "h", "ⱨ": "h", "ḧ": "h", "ḣ": "h", "ḥ": "h", "ɦ": "h", "ẖ": "h", "ħ": "h", "ƕ": "hv", "í": "i", "ĭ": "i", "ǐ": "i", "î": "i", "ï": "i", "ḯ": "i", "ị": "i", "ȉ": "i", "ì": "i", "ỉ": "i", "ȋ": "i", "ī": "i", "į": "i", "ᶖ": "i", "ɨ": "i", "ĩ": "i", "ḭ": "i", "ꝺ": "d", "ꝼ": "f", "ᵹ": "g", "ꞃ": "r", "ꞅ": "s", "ꞇ": "t", "ꝭ": "is", "ǰ": "j", "ĵ": "j", "ʝ": "j", "ɉ": "j", "ḱ": "k", "ǩ": "k", "ķ": "k", "ⱪ": "k", "ꝃ": "k", "ḳ": "k", "ƙ": "k", "ḵ": "k", "ᶄ": "k", "ꝁ": "k", "ꝅ": "k", "ĺ": "l", "ƚ": "l", "ɬ": "l", "ľ": "l", "ļ": "l", "ḽ": "l", "ȴ": "l", "ḷ": "l", "ḹ": "l", "ⱡ": "l", "ꝉ": "l", "ḻ": "l", "ŀ": "l", "ɫ": "l", "ᶅ": "l", "ɭ": "l", "ł": "l", "ǉ": "lj", "ſ": "s", "ẜ": "s", "ẛ": "s", "ẝ": "s", "ḿ": "m", "ṁ": "m", "ṃ": "m", "ɱ": "m", "ᵯ": "m", "ᶆ": "m", "ń": "n", "ň": "n", "ņ": "n", "ṋ": "n", "ȵ": "n", "ṅ": "n", "ṇ": "n", "ǹ": "n", "ɲ": "n", "ṉ": "n", "ƞ": "n", "ᵰ": "n", "ᶇ": "n", "ɳ": "n", "ñ": "n", "ǌ": "nj", "ó": "o", "ŏ": "o", "ǒ": "o", "ô": "o", "ố": "o", "ộ": "o", "ồ": "o", "ổ": "o", "ỗ": "o", "ö": "o", "ȫ": "o", "ȯ": "o", "ȱ": "o", "ọ": "o", "ő": "o", "ȍ": "o", "ò": "o", "ỏ": "o", "ơ": "o", "ớ": "o", "ợ": "o", "ờ": "o", "ở": "o", "ỡ": "o", "ȏ": "o", "ꝋ": "o", "ꝍ": "o", "ⱺ": "o", "ō": "o", "ṓ": "o", "ṑ": "o", "ǫ": "o", "ǭ": "o", "ø": "o", "ǿ": "o", "õ": "o", "ṍ": "o", "ṏ": "o", "ȭ": "o", "ƣ": "oi", "ꝏ": "oo", "ɛ": "e", "ᶓ": "e", "ɔ": "o", "ᶗ": "o", "ȣ": "ou", "ṕ": "p", "ṗ": "p", "ꝓ": "p", "ƥ": "p", "ᵱ": "p", "ᶈ": "p", "ꝕ": "p", "ᵽ": "p", "ꝑ": "p", "ꝙ": "q", "ʠ": "q", "ɋ": "q", "ꝗ": "q", "ŕ": "r", "ř": "r", "ŗ": "r", "ṙ": "r", "ṛ": "r", "ṝ": "r", "ȑ": "r", "ɾ": "r", "ᵳ": "r", "ȓ": "r", "ṟ": "r", "ɼ": "r", "ᵲ": "r", "ᶉ": "r", "ɍ": "r", "ɽ": "r", "ↄ": "c", "ꜿ": "c", "ɘ": "e", "ɿ": "r", "ś": "s", "ṥ": "s", "š": "s", "ṧ": "s", "ş": "s", "ŝ": "s", "ș": "s", "ṡ": "s", "ṣ": "s", "ṩ": "s", "ʂ": "s", "ᵴ": "s", "ᶊ": "s", "ȿ": "s", "ɡ": "g", "ᴑ": "o", "ᴓ": "o", "ᴝ": "u", "ť": "t", "ţ": "t", "ṱ": "t", "ț": "t", "ȶ": "t", "ẗ": "t", "ⱦ": "t", "ṫ": "t", "ṭ": "t", "ƭ": "t", "ṯ": "t", "ᵵ": "t", "ƫ": "t", "ʈ": "t", "ŧ": "t", "ᵺ": "th", "ɐ": "a", "ᴂ": "ae", "ǝ": "e", "ᵷ": "g", "ɥ": "h", "ʮ": "h", "ʯ": "h", "ᴉ": "i", "ʞ": "k", "ꞁ": "l", "ɯ": "m", "ɰ": "m", "ᴔ": "oe", "ɹ": "r", "ɻ": "r", "ɺ": "r", "ⱹ": "r", "ʇ": "t", "ʌ": "v", "ʍ": "w", "ʎ": "y", "ꜩ": "tz", "ú": "u", "ŭ": "u", "ǔ": "u", "û": "u", "ṷ": "u", "ü": "u", "ǘ": "u", "ǚ": "u", "ǜ": "u", "ǖ": "u", "ṳ": "u", "ụ": "u", "ű": "u", "ȕ": "u", "ù": "u", "ủ": "u", "ư": "u", "ứ": "u", "ự": "u", "ừ": "u", "ử": "u", "ữ": "u", "ȗ": "u", "ū": "u", "ṻ": "u", "ų": "u", "ᶙ": "u", "ů": "u", "ũ": "u", "ṹ": "u", "ṵ": "u", "ᵫ": "ue", "ꝸ": "um", "ⱴ": "v", "ꝟ": "v", "ṿ": "v", "ʋ": "v", "ᶌ": "v", "ⱱ": "v", "ṽ": "v", "ꝡ": "vy", "ẃ": "w", "ŵ": "w", "ẅ": "w", "ẇ": "w", "ẉ": "w", "ẁ": "w", "ⱳ": "w", "ẘ": "w", "ẍ": "x", "ẋ": "x", "ᶍ": "x", "ý": "y", "ŷ": "y", "ÿ": "y", "ẏ": "y", "ỵ": "y", "ỳ": "y", "ƴ": "y", "ỷ": "y", "ỿ": "y", "ȳ": "y", "ẙ": "y", "ɏ": "y", "ỹ": "y", "ź": "z", "ž": "z", "ẑ": "z", "ʑ": "z", "ⱬ": "z", "ż": "z", "ẓ": "z", "ȥ": "z", "ẕ": "z", "ᵶ": "z", "ᶎ": "z", "ʐ": "z", "ƶ": "z", "ɀ": "z", "ﬀ": "ff", "ﬃ": "ffi", "ﬄ": "ffl", "ﬁ": "fi", "ﬂ": "fl", "ĳ": "ij", "œ": "oe", "ﬆ": "st", "ₐ": "a", "ₑ": "e", "ᵢ": "i", "ⱼ": "j", "ₒ": "o", "ᵣ": "r", "ᵤ": "u", "ᵥ": "v", "ₓ": "x" };
+String.prototype.latinise = function () { return this.replace(/[^A-Za-z0-9\[\] ]/g, function (a) { return Latinise.latin_map[a] || a }) };
+String.prototype.latinize = String.prototype.latinise;
+String.prototype.isLatin = function () { return this == this.latinise() }
