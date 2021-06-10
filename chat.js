@@ -12,64 +12,22 @@ var members =
 		{ user: 'TotoroPHD', color: 'red' },
 		{ user: 'Lokimolp', color: '#ff33fc' },
 		{ user: 'yumemasho', color: '#21A1BE' },
-		{ user: 'Lunevirtuelle', color: '#fabc14' }
+		{ user: 'Lunevirtuelle', color: '#4098bf' },
+		{ user: 'gusgusgusgus_', color: 'pink' },
+		{ user: 'Mathilde_&_Gus', color: 'pink' },
+		{ user: 'AnErsatz_', color: '#ff5600' },
+		{ user: 'poopinette1', color: 'purple' },
+		{ user: 'Sombwich', color: '#666666' }
 	]
 
 
-	var totalpoints = [
-		{ user: 'poopinette1', points: 73, gold: 8, silver: 13, bronze: 23 },
-		{ user: 'benlal', points: 56, gold: 12, silver: 8, bronze: 4 },
-		{ user: 'Laure_____', points: 91, gold: 13, silver: 17, bronze: 18 },
-		{ user: 'foamyrep', points: 4, gold: 1, silver: 0, bronze: 1 },
-		{ user: 'biotgosse', points: 69, gold: 12, silver: 9, bronze: 15 },
-		{ user: 'Sombwich', points: 107, gold: 15, silver: 19, bronze: 24 },
-		{
-		  user: 'antoine_g_28',
-		  points: 93,
-		  gold: 14,
-		  silver: 13,
-		  bronze: 25
-		},
-		{ user: 'MinaLae', points: 45, gold: 4, silver: 8, bronze: 17 },
-		{ user: 'Nolette_', points: 31, gold: 5, silver: 4, bronze: 8 },
-		{ user: 'PrinceYaku', points: 226, gold: 49, silver: 25, bronze: 29 },
-		{ user: 'Lunevirtuelle', points: 15, gold: 2, silver: 0, bronze: 9 },
-		{ user: 'AnErsatz_', points: 52, gold: 5, silver: 11, bronze: 15 },
-		{ user: 'treguy', points: 15, gold: 4, silver: 1, bronze: 1 },
-		{
-		  user: 'sophiste_petoncule',
-		  points: 44,
-		  gold: 7,
-		  silver: 6,
-		  bronze: 11
-		},
-		{
-		  user: 'gusgusgusgus_',
-		  points: 69,
-		  gold: 9,
-		  silver: 11,
-		  bronze: 20
-		},
-		{ user: 'yumemasho', points: 52, gold: 4, silver: 11, bronze: 18 },
-		{ user: 'Volhta', points: 42, gold: 5, silver: 8, bronze: 11 },
-		{ user: 'Abawouak', points: 2, gold: 0, silver: 1, bronze: 0 },
-		{
-		  user: 'YvonnePistachette',
-		  points: 5,
-		  gold: 0,
-		  silver: 1,
-		  bronze: 3
-		},
-		{ user: 'Sirgeese', points: 22, gold: 4, silver: 4, bronze: 2 },
-		{ user: 'DaitheArts', points: 16, gold: 1, silver: 2, bronze: 9 },
-		{ user: 'ThomasHercouet', points: 2, gold: 0, silver: 1, bronze: 0 }
-	  ]
-	  
+var totalpoints = []
+
 var instruments = ['Batterie', 'Basse', 'Autre', 'Voix'];
 var categories = [' 1 ', ' 2 ', ' 3 ', ' 4 '];
 var colorcategories = ['#00DDEE', '#E02887', '#F5ED0B', '#31e62b'];
 
-var tokens = [], points = [], voteprop = [], votes = [], collabblank = [], collabsongs = [], seloupoivre = []
+var tokens = [], points = [], voteprop = [], votes = [], collabblank = [], collabsongs = [], sel = [], poivre = [], multisongs = [], infonbwin = [];
 var tbfcollab = [], collabfound = [], chat = [], bonusletters = [], bonusprop = [], bonusans = [], singlewin = [], djviewers = [], years = [], gus = [], hintpic = []
 var ready = false, songfound = false, info1found = false, info2found = false, gusstop = false, selstop = false, hint = false, loadedhint = false
 
@@ -85,11 +43,11 @@ var bonusfound = "false";
 var defaultdelay = 700;
 var seldelay = 1000;
 
-var defaultdelay = 0;
+//var defaultdelay = 0;
 
 var countdown = -1;
 var countdownsel = -1;
-var nbwin, defaultnbwin = 3;
+var nbwin = 3, defaultnbwin = 3;
 
 //var defaultnbwin = 1;
 
@@ -122,6 +80,13 @@ ws.onmessage = function (event) {
 	if (msg.content == undefined) {
 		return;
 	}
+
+	if (msg.user == "gusgusgusgus_") {
+		msg.user = "Mathilde_et_Gus";
+	}
+
+	// msg.user += (debugInc % 120).toString();
+	// debugInc++;
 
 	if (msg.content.startsWith("!addpoints")) {
 		if (msg.isBroadcaster == "true") {
@@ -360,7 +325,8 @@ ws.onmessage = function (event) {
 							break;
 						case 'sel':
 							visiblesel = true;
-							seloupoivre = [];
+							sel = [];
+							poivre = [];
 							selstop = false;
 							break;
 					}
@@ -369,6 +335,12 @@ ws.onmessage = function (event) {
 					doublewin = [[], []];
 					info1found = false;
 					info2found = false;
+					for (var i = 0; i < 2; i++) {
+						if (songlist.find(x => x.listname === liste).songs[songindex].info[i].nbwin != undefined) {
+							infonbwin[i] = songlist.find(x => x.listname === liste).songs[songindex].info[i].nbwin;
+						}
+						else infonbwin[i] = defaultnbwin;
+					}
 					break;
 				case 'multi':
 					stopsong.pause();
@@ -379,7 +351,8 @@ ws.onmessage = function (event) {
 					break;
 				case 'sel':
 					visiblesel = true;
-					seloupoivre = [];
+					sel = [];
+					poivre = [];
 					break;
 				default:
 					console.log('gametype not found')
@@ -637,8 +610,7 @@ ws.onmessage = function (event) {
 					songfound = true;
 
 					countdown = -1;
-					if(gametype != 'gus')
-					{
+					if (gametype != 'gus') {
 						ready = false;
 					}
 
@@ -708,21 +680,19 @@ ws.onmessage = function (event) {
 				if (ok) {
 					if (!collabfound[i]) collabfound[i] = [];
 
-					if(collabfound[i].length < 3)
-					{
+					if (collabfound[i].length < 3) {
 						if (collabfound[i].find(x => x.user === msg.user) == undefined) {
 
-							collabfound[i].push({'user':msg.user,'time':collabtime})
-							if (collabfound[i].length > 0)
-							{
+							collabfound[i].push({ 'user': msg.user, 'time': collabtime })
+							if (collabfound[i].length > 0) {
 								tbfcollab[i].found = true;
-								switch(collabfound[i].length){
+								switch (collabfound[i].length) {
 									case 1:
 										addPoints(3, msg.user)
 										break;
 									case 2:
 										addPoints(2, msg.user)
-										break;									
+										break;
 									case 3:
 										addPoints(1, msg.user)
 										break;
@@ -760,15 +730,15 @@ ws.onmessage = function (event) {
 		addChat(msg.user, msg.content, "", "yes");
 		if (!selstop) {
 			const duplicate = x => x.user.toString() === msg.user
-			if (seloupoivre.findIndex(duplicate) >= 0) {
+			if (sel.findIndex(duplicate) >= 0 || poivre.findIndex(duplicate) >= 0) {
 				console.log("déjà trouvé");
 			}
 			else {
 				if (msg.content.toUpperCase() == "SEL" || msg.content.toUpperCase() == "S" || msg.content == "1") {
-					seloupoivre.push({ 'user': msg.user, 'answer': 'sel' });
+					sel.push({ 'user': msg.user });
 				}
 				else if (msg.content.toUpperCase() == "POIVRE" || msg.content.toUpperCase() == "P" || msg.content == "2") {
-					seloupoivre.push({ 'user': msg.user, 'answer': 'poivre' });
+					poivre.push({ 'user': msg.user });
 				}
 			}
 		}
@@ -807,12 +777,12 @@ ws.onmessage = function (event) {
 
 					chat[chat.length - 1].cur = "yes" + i;
 
-					if (doublewin[i].length < nbwin) {
+					if (doublewin[i].length < infonbwin[i]) {
 						doublewin[i].push({ 'user': msg.user });
 					}
 				}
 
-				if (doublewin[0].length == nbwin && info1found == false) {
+				if (doublewin[0].length == infonbwin[0] && info1found == false) {
 					info1found = true;
 					givePoints(doublewin[0]);
 					for (var i = 0; i < chat.length; i++) {
@@ -820,7 +790,7 @@ ws.onmessage = function (event) {
 					}
 				}
 
-				if (doublewin[1].length == nbwin && info2found == false) {
+				if (doublewin[1].length == infonbwin[1] && info2found == false) {
 					info2found = true;
 					givePoints(doublewin[1]);
 					for (var i = 0; i < chat.length; i++) {
@@ -885,6 +855,7 @@ ws.onmessage = function (event) {
 		if (numberfound == 6) {
 			if (songfound == false) {
 				stopsong.play();
+				visiblewin = true;
 				ws.send("!say Bravo, vous avez tout trouvé ! Pour réécouter tranquillement : ");
 				for (var i = 0; i < songlist.find(x => x.listname === liste).songs[songindex].songs.length; i++) {
 					ws.send("!say " + songlist.find(x => x.listname === liste).songs[songindex].songs[i].fullname + " - " + songlist.find(x => x.listname === liste).songs[songindex].songs[i].youtube);
@@ -1033,9 +1004,19 @@ function drawDoubleTags() {
 			ctx.font = '20px Trebuchet MS';
 			ctx.fillStyle = "white";
 		}
+		else {
+			ctx.font = '20px Trebuchet MS';
+			ctx.fillStyle = "white";
+			ctx.fillText("2 informations à trouver :", x / 2 - 400 - ctx.measureText("2 informations à trouver :").width / 2, 160);
+		}
 	}
-	else
+	else {
+		ctx.font = '20px Trebuchet MS';
+		ctx.fillStyle = "white";
 		ctx.fillText("2 informations à trouver :", x / 2 - 400 - ctx.measureText("2 informations à trouver :").width / 2, 160);
+	}
+
+
 
 	var info1 = songlist.find(x => x.listname === liste).info1;
 	var info2 = songlist.find(x => x.listname === liste).info2;
@@ -1109,11 +1090,15 @@ function drawWinImage() {
 	img.src = winImage; // Définit le chemin vers sa source
 	img.onload = function () {
 
+		var xslide = 0;
+		var yslide = 0;
+
 		var hRatio = 380 / img.width;
 		var vRatio = 555 / img.height;
 
 		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus' || gametype == 'sel') {
 			var vRatio = 380 / img.height;
+			xslide = 820; yslide = -390;
 		}
 
 		var ratio = Math.min(hRatio, vRatio);
@@ -1136,18 +1121,18 @@ function drawWinImage() {
 		ctx.strokeStyle = 'white';
 
 		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus' || gametype == 'sel') {
-			ctx.drawImage(img, 0, 0, img.width, img.height, x / 2 - 400 + xoffset, 515 + yoffset, img.width * ratio, img.height * ratio);
+			ctx.drawImage(img, 0, 0, img.width, img.height, x / 2 - 400 + xoffset + xslide, 515 + yoffset + yslide, img.width * ratio, img.height * ratio);
 			if (hint && !songfound) {
-				ctx.drawImage(hintpic[hintreveal], x / 2 - 400, 515, 380, 380);
+				ctx.drawImage(hintpic[hintreveal], x / 2 - 400 + xslide, 515 + yslide, 380, 380);
 			}
-			roundRect(ctx, x / 2 - 400, 515, 380, 380, 5, false);
+			roundRect(ctx, x / 2 - 400 + xslide, 515 + yslide, 380, 380, 5, false);
 		}
 		else {
-			ctx.drawImage(img, 0, 0, img.width, img.height, x / 2 - 400 + xoffset, 340 + yoffset, img.width * ratio, img.height * ratio);
+			ctx.drawImage(img, 0, 0, img.width, img.height, x / 2 - 400 + xoffset + xslide, 340 + yoffset + yslide, img.width * ratio, img.height * ratio);
 			if (hint && !songfound) {
-				ctx.drawImage(hintpic[hintreveal], x / 2 - 400, 340, 380, 555);
+				ctx.drawImage(hintpic[hintreveal], x / 2 - 400 + xslide, 340 + yslide, 380, 555);
 			}
-			roundRect(ctx, x / 2 - 400, 340, 380, 555, 5, false);
+			roundRect(ctx, x / 2 - 400 + xslide, 340 + yslide, 380, 555, 5, false);
 		}
 	}
 }
@@ -1411,7 +1396,7 @@ function addPoints(amount, user) {
 
 function displayPoints() {
 	if (visiblepoints || visibletotalpoints) {
-		var maxheight = 12;
+		var maxheight = 30;
 		var disppoints = [];
 		if (visiblepoints) { disppoints = Array.from(points); } else { disppoints = Array.from(totalpoints); }
 		var column = 1 + Math.trunc((disppoints.length - 1) / maxheight);
@@ -1422,7 +1407,7 @@ function displayPoints() {
 		}
 		var wpoints = 300 * column;
 
-		ctx.clearRect(x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints);
+		ctx.clearRect(x / 2 - 400 - wpoints / 2, 450 - hpoints / 2, wpoints, hpoints);
 
 		disppoints.sort((a, b) => a.points - b.points);
 		disppoints.reverse();
@@ -1430,11 +1415,11 @@ function displayPoints() {
 		ctx.fillStyle = bg;
 		if (visiblepoints) { ctx.strokeStyle = "orange"; } else { ctx.strokeStyle = "purple"; }
 
-		roundRect(ctx, x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints, 20, true);
+		roundRect(ctx, x / 2 - 400 - wpoints / 2, 450 - hpoints / 2, wpoints, hpoints, 20, true);
 
 		ctx.font = '40px Trebuchet MS';
 		ctx.fillStyle = ctx.strokeStyle;
-		ctx.fillText("Scores", x / 2 - 400 - ctx.measureText("Scores").width / 2, 320 - hpoints / 2 + 50);
+		ctx.fillText("Scores", x / 2 - 400 - ctx.measureText("Scores").width / 2, 450 - hpoints / 2 + 50);
 
 		ctx.font = '18px Trebuchet MS';
 
@@ -1453,11 +1438,11 @@ function displayPoints() {
 			var wscore = ctx.measureText(usr + pts + "🥇🥇🥇 - " + gold + silver + bronze).width;
 
 			ctx.fillStyle = getUserColor(usr);
-			ctx.fillText(usr, x / 2 - 400 + colx - wscore / 2, 320 - hpoints / 2 + 90 + curi * 25);
+			ctx.fillText(usr, x / 2 - 400 + colx - wscore / 2, 450 - hpoints / 2 + 90 + curi * 25);
 
 			ctx.fillStyle = "white";
 
-			ctx.fillText(" 🥇" + gold + "🥈" + silver + "🥉" + bronze + " - " + pts, x / 2 - 400 + colx - wscore / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 90 + curi * 25);
+			ctx.fillText(" 🥇" + gold + "🥈" + silver + "🥉" + bronze + " - " + pts, x / 2 - 400 + colx - wscore / 2 + ctx.measureText(usr).width, 450 - hpoints / 2 + 90 + curi * 25);
 		}
 		ctx.fillStyle = "white";
 		ctx.strokeStyle = "white";
@@ -1475,14 +1460,12 @@ function displayCollabPoints() {
 		var curwidth = 0;
 		curwidth = ctx.measureText(tbfcollab[i].name + " : ").width;
 		if (tbfcollab[i].found) {
-			for (var j = 0; j < collabfound[i].length; j++)
-			{
+			for (var j = 0; j < collabfound[i].length; j++) {
 				curwidth += ctx.measureText(collabfound[i][j].user + "(" + collabfound[i][j].time / 100 + "s)").width;
 			}
-			
+
 		}
-		if (curwidth > width)
-		{
+		if (curwidth > width) {
 			width = curwidth
 		}
 	}
@@ -1496,18 +1479,17 @@ function displayCollabPoints() {
 	for (var i = 0; i < tbfcollab.length; i++) {
 
 		ctx.fillStyle = "white"
-		ctx.fillText(tbfcollab[i].name + " : ", x / 2  - 400 - width / 2 + 10 , 150 + 30 * i)
+		ctx.fillText(tbfcollab[i].name + " : ", x / 2 - 400 - width / 2 + 10, 150 + 30 * i)
 
 		if (tbfcollab[i].found) {
 			var txtx = ctx.measureText(tbfcollab[i].name + " : ").width;
-			for (var j = 0; j < collabfound[i].length; j++)
-			{
+			for (var j = 0; j < collabfound[i].length; j++) {
 				ctx.fillStyle = getUserColor(collabfound[i][j].user);
 				ctx.fillText(collabfound[i][j].user, x / 2 - 400 - width / 2 + 10 + txtx, 150 + 30 * i)
-				txtx+=ctx.measureText(collabfound[i][j].user).width;
+				txtx += ctx.measureText(collabfound[i][j].user).width;
 				ctx.fillStyle = "white";
 				ctx.fillText("(" + collabfound[i][j].time / 100 + "s) ", x / 2 - 400 - width / 2 + 10 + txtx, 150 + 30 * i)
-				txtx +=ctx.measureText("(" + collabfound[i][j].time / 100 + "s) ").width;
+				txtx += ctx.measureText("(" + collabfound[i][j].time / 100 + "s) ").width;
 			}
 		}
 	}
@@ -1515,8 +1497,7 @@ function displayCollabPoints() {
 
 function displaySel() {
 
-	drawCadre("white");
-	drawCadre("white", 130, 70);
+	drawCadre("white", 80);
 	ctx.font = '30px Trebuchet MS';
 
 	ctx.fillStyle = "yellow";
@@ -1548,33 +1529,36 @@ function displaySel() {
 		questionpoivre = songlist.find(x => x.listname === liste).songs[songindex].poivre;
 
 	ctx.fillStyle = "white";
-	roundRect(ctx, x / 2 - 800, 190, 390, 130, 20, false);
-	roundRect(ctx, x / 2 - 800 + 390, 190, 390, 130, 20, false);
-
-	ctx.fillText("Sel", x / 2 - 400 - ctx.measureText("Sel").width / 2 - 760 / 4, 230);
-	ctx.fillText(questionsel, x / 2 - 400 - ctx.measureText(questionsel).width / 2 - 760 / 4, 280);
-
-	ctx.fillStyle = "grey";
-	ctx.fillText("Poivre", x / 2 - 400 - ctx.measureText("Poivre").width / 2 + 760 / 4, 230);
-	ctx.fillText(questionpoivre, x / 2 - 400 - ctx.measureText(questionpoivre).width / 2 + 760 / 4, 280);
-
-	ctx.fillStyle = "white";
 
 
-	var maxheight = 6;
-	var column = 1 + Math.trunc((seloupoivre.length - 1) / maxheight);
+	var maxheight = 30;
 
-	var hpoints = 90 + seloupoivre.length * 25;
-	if (seloupoivre.length > maxheight) {
-		hpoints = 90 + maxheight * 25
+	var scolumn = 1 + Math.trunc((sel.length - 1) / maxheight);
+	var pcolumn = 1 + Math.trunc((poivre.length - 1) / maxheight);
+
+
+	var shpoints = 90 + sel.length * 25;
+	var phpoints = 90 + poivre.length * 25;
+
+	if (sel.length > maxheight) {
+		shpoints = 90 + maxheight * 25
 	}
+
+	if (poivre.length > maxheight) {
+		phpoints = 90 + maxheight * 25
+	}
+
 
 	ctx.clearRect(x / 2 - 800, 120 + 200, 780, 195);
 
 	ctx.fillStyle = bg;
 	ctx.strokeStyle = "pink";
+	roundRect(ctx, x / 2 - 800, y / 2 - shpoints / 2, 390, shpoints, 20, true);
+	roundRect(ctx, x / 2 - 800 + 390, y / 2 - phpoints / 2, 390, phpoints, 20, true);
 
-	roundRect(ctx, x / 2 - 800, 120 + 200, 780, 195, 20, true);
+	ctx.fillStyle = "white";
+	ctx.fillText("Sel : " + questionsel, x / 2 - 800 + 390/2 - ctx.measureText("Sel : " + questionsel).width / 2, y / 2 - shpoints / 2 + 40);
+	ctx.fillText("Poivre : " + questionpoivre, x / 2 - 800 + 390 + 390/2 - ctx.measureText("Poivre : " + questionpoivre).width / 2, y / 2 - phpoints / 2 + 40);
 
 	var ans = "ans"
 	if (songindex >= 0)
@@ -1583,74 +1567,63 @@ function displaySel() {
 	ctx.font = '30px Trebuchet MS';
 	ctx.fillStyle = ctx.strokeStyle;
 
-	if (!selstop) {
-		ctx.fillText("Sel ou Poivre", x / 2 - 400 - ctx.measureText("Sel ou Poivre").width / 2, 350);
-	}
-	else {
-		ctx.fillText("Réponse : " + ans, x / 2 - 400 - ctx.measureText("Réponse : " + ans).width / 2, 350);
+	if (selstop) {
+		ctx.strokeStyle = "green";
+		ctx.fillStyle = "white";
+		if (ans == "sel")
+		{
+			roundRect(ctx, x / 2 - 800, y / 2 - shpoints / 2, 390, shpoints, 20, false);
+		}
+		else
+		{
+			roundRect(ctx, x / 2 - 800 + 390, y / 2 - phpoints / 2, 390, phpoints, 20, false);
+		}
 	}
 
 	ctx.font = '18px Trebuchet MS';
-	for (var i = 0; i < seloupoivre.length; i++) {
+	for (var i = 0; i < sel.length; i++) {
 		var curcol = 1 + Math.trunc(i / maxheight);
 		var colx = 0;
-		colx = 200 * curcol - 100 - 200 * (column / 2);
+		colx = 200 * curcol - 100 - 200 * (scolumn / 2);
 		var curi = i % maxheight;
 
-		var usr = seloupoivre[i].user;
-		var usrans = seloupoivre[i].answer;
-
-		var wmin = ctx.measureText(usr + " - " + "P").width;
+		var usr = sel[i].user;
+		var wmin = ctx.measureText(usr).width;
 
 		ctx.fillStyle = getUserColor(usr);
-		ctx.fillText(usr, x / 2 - 400 + colx - wmin / 2, 320 - hpoints / 2 + 180 + curi * 25);
-
-		ctx.fillStyle = "white";
-		var emoji;
-
-		if (usrans == 'sel') {
-			emoji = "Sel"
-		}
-		else {
-			emoji = "Poivre"
-		}
-
-		if (selstop) {
-			ctx.strokeStyle = "green";
-			if (ans == "sel") {
-				roundRect(ctx, x / 2 - 800, 190, 390, 130, 20, false);
-			}
-			else {
-				roundRect(ctx, x / 2 - 800 + 390, 190, 390, 130, 20, false);
-			}
-
-			if (ans == usrans) {
-				ctx.fillStyle = "green";
-			}
-			else {
-				ctx.fillStyle = "red";
-			}
-		}
-		ctx.fillText(" " + emoji, x / 2 - 400 + colx - wmin / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 180 + curi * 25);
+		ctx.fillText(usr, x / 2 - 400 - 200 + colx - wmin / 2, 320 - shpoints / 2 + 220 + curi * 25);
 	}
+
+	for (var i = 0; i < poivre.length; i++) {
+		var curcol = 1 + Math.trunc(i / maxheight);
+		var colx = 0;
+		colx = 200 * curcol - 100 - 200 * (pcolumn / 2);
+		var curi = i % maxheight;
+
+		var usr = poivre[i].user;
+		var wmin = ctx.measureText(usr).width;
+
+		ctx.fillStyle = getUserColor(usr);
+		ctx.fillText(usr, x / 2 - 400 + 200 + colx - wmin / 2, 320 - phpoints / 2 + 220 + curi * 25);
+	}	
 }
 
 function displayYears() {
-	var maxheight = 12;
+	var maxheight = 30;
 	var column = 1 + Math.trunc((years.length - 1) / maxheight);
 
 	var hpoints = 90 + years.length * 25;
 	if (years.length > maxheight) {
 		hpoints = 90 + maxheight * 25
 	}
-	var wpoints = 300 * column;
+	var wpoints = 250 * column;
 
-	ctx.clearRect(x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints);
+	ctx.clearRect(x / 2 - 400 - wpoints / 2, 450 - hpoints / 2, wpoints, hpoints);
 
 	ctx.fillStyle = bg;
 	ctx.strokeStyle = "pink";
 
-	roundRect(ctx, x / 2 - 400 - wpoints / 2, 320 - hpoints / 2, wpoints, hpoints, 20, true);
+	roundRect(ctx, x / 2 - 400 - wpoints / 2, 450 - hpoints / 2, wpoints, hpoints, 20, true);
 
 	ctx.font = '40px Trebuchet MS';
 	ctx.fillStyle = ctx.strokeStyle;
@@ -1661,10 +1634,10 @@ function displayYears() {
 		ansyear = parseInt(songlist.find(x => x.listname === liste).songs[songindex].name);
 
 	if (!songfound) {
-		ctx.fillText("Années", x / 2 - 400 - ctx.measureText("Années").width / 2, 320 - hpoints / 2 + 50);
+		ctx.fillText("Années", x / 2 - 400 - ctx.measureText("Années").width / 2, 450 - hpoints / 2 + 50);
 	}
 	else {
-		ctx.fillText("Réponse : " + ansyear, x / 2 - 400 - ctx.measureText("Réponse : " + ansyear).width / 2, 320 - hpoints / 2 + 50);
+		ctx.fillText(ansyear, x / 2 - 400 - ctx.measureText(ansyear).width / 2, 450 - hpoints / 2 + 50);
 	}
 
 	ctx.font = '18px Trebuchet MS';
@@ -1672,7 +1645,7 @@ function displayYears() {
 	for (var i = 0; i < years.length; i++) {
 		var curcol = 1 + Math.trunc(i / maxheight);
 		var colx = 0;
-		colx = 300 * curcol - 150 - 300 * (column / 2);
+		colx = 250 * curcol - 120 - 250 * (column / 2);
 		var curi = i % maxheight;
 
 		var usr = years[i].user;
@@ -1681,7 +1654,7 @@ function displayYears() {
 		var wyea = ctx.measureText(usr + " - " + yea).width;
 
 		ctx.fillStyle = getUserColor(usr);
-		ctx.fillText(usr, x / 2 - 400 + colx - wyea / 2, 320 - hpoints / 2 + 90 + curi * 25);
+		ctx.fillText(usr, x / 2 - 400 + colx - wyea / 2, 450 - hpoints / 2 + 90 + curi * 25);
 
 		ctx.fillStyle = "white";
 		var medal = " ";
@@ -1702,7 +1675,7 @@ function displayYears() {
 				ctx.fillStyle = "red";
 			}
 		}
-		ctx.fillText(medal + yea, x / 2 - 400 + colx - wyea / 2 + ctx.measureText(usr).width, 320 - hpoints / 2 + 90 + curi * 25);
+		ctx.fillText(medal + yea, x / 2 - 400 + colx - wyea / 2 + ctx.measureText(usr).width, 450 - hpoints / 2 + 90 + curi * 25);
 
 	}
 	ctx.fillStyle = "white";
@@ -1837,35 +1810,46 @@ function giveSelPoints(answer) {
 	var bonus = 6;
 	var sayresult = "";
 	var atleastone = false;
+	var correct = [];
 
-	for (var i = 0; i < seloupoivre.length; i++) {
+	if (answer == "sel") {
+		correct = Array.from(sel);
+	}
+	else {
+		correct = Array.from(poivre);
+	}
 
-		if (seloupoivre[i].answer == answer) {
-			atleastone = true;
-			switch (bonus) {
-				case 6:
-					sayresult += "3 points" + " pour : "
-				case 5:
-					sayresult += seloupoivre[i].user + ", "
-					addPoints(3, seloupoivre[i].user);
-					bonus--;
-					break;
-				case 4:
-					sayresult += "2 points" + " pour : "
-				case 3:
-					sayresult += seloupoivre[i].user + ", "
-					addPoints(2, seloupoivre[i].user);
-					bonus--;
-					break;
-				case 2:
-					sayresult += "1 point" + " pour : "
-					bonus--;
-				case 1:
-					sayresult += seloupoivre[i].user + ", "
-					addPoints(1, seloupoivre[i].user);
-					break;
-				default:
-			}
+	for (var i = 0; i < correct.length; i++) {
+		atleastone = true;
+		switch (bonus) {
+			case 6:
+				sayresult += "3 points" + " pour : "
+			case 5:
+				sayresult += correct[i].user + ", "
+				addPoints(3, correct[i].user);
+				bonus--;
+				if (tokens.find(x => x.user === correct[i].user) == undefined) {
+					tokens.push({ 'user': correct[i].user, 'token': 1 });
+				}
+				else {
+					tokens.find(x => x.user === correct[i].user).token++;
+				}
+				break;
+			case 4:
+				sayresult += "2 points" + " pour : "
+			case 3:
+				sayresult += correct[i].user + ", "
+				addPoints(2, correct[i].user);
+				bonus--;
+				break;
+			case 2:
+				sayresult += "1 point" + " pour : "
+				bonus--;
+			case 1:
+				sayresult += correct[i].user + ", "
+				addPoints(1, correct[i].user);
+				break;
+			default:
 		}
 	}
 
