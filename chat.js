@@ -6,6 +6,8 @@ var ws = new WebSocket("ws://192.168.1.13:8100");
 var x = 1900;
 var y = 920;
 
+//https://api.giphy.com/v1/stickers/search?api_key=[ta clef api ici&q=[mot clef]&&rating=G
+
 var members =
 	[
 		{ user: 'Personne', color: '#FF0000' },
@@ -37,13 +39,13 @@ var debugInc = 0, delay = 0, numberfound = 0, songindex = 0, hintreveal = 0, cou
 
 var collabpic = new Image();
 
-var bonusword, stopsong, youtube, winImage, fullsongname, singletext, alternate;
+var bonusword, stopsong, youtube, winImage, fullsongname, singletext, alternate, gifJSON;
 var bonusfound = "false";
 
 var defaultdelay = 700;
 var seldelay = 1000;
 
-//var defaultdelay = 0;
+var defaultdelay = 0;
 
 var countdown = -1;
 var countdownsel = -1;
@@ -1117,10 +1119,11 @@ function drawWinImage() {
 			xoffset = Math.round((380 - img.width * ratio) / 2);
 		}
 
-		ctx.fillStyle = 'white';
+		ctx.fillStyle = 'black';
 		ctx.strokeStyle = 'white';
 
 		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus' || gametype == 'sel') {
+			roundRect(ctx, x / 2 - 400 + xslide, 515 + yslide, 380, 380, 5, true);
 			ctx.drawImage(img, 0, 0, img.width, img.height, x / 2 - 400 + xoffset + xslide, 515 + yoffset + yslide, img.width * ratio, img.height * ratio);
 			if (hint && !songfound) {
 				ctx.drawImage(hintpic[hintreveal], x / 2 - 400 + xslide, 515 + yslide, 380, 380);
@@ -1128,6 +1131,7 @@ function drawWinImage() {
 			roundRect(ctx, x / 2 - 400 + xslide, 515 + yslide, 380, 380, 5, false);
 		}
 		else {
+			roundRect(ctx, x / 2 - 400 + xslide, 340 + yslide, 380, 555, 5, true);
 			ctx.drawImage(img, 0, 0, img.width, img.height, x / 2 - 400 + xoffset + xslide, 340 + yoffset + yslide, img.width * ratio, img.height * ratio);
 			if (hint && !songfound) {
 				ctx.drawImage(hintpic[hintreveal], x / 2 - 400 + xslide, 340 + yslide, 380, 555);
@@ -1557,8 +1561,8 @@ function displaySel() {
 	roundRect(ctx, x / 2 - 800 + 390, y / 2 - phpoints / 2, 390, phpoints, 20, true);
 
 	ctx.fillStyle = "white";
-	ctx.fillText("Sel : " + questionsel, x / 2 - 800 + 390/2 - ctx.measureText("Sel : " + questionsel).width / 2, y / 2 - shpoints / 2 + 40);
-	ctx.fillText("Poivre : " + questionpoivre, x / 2 - 800 + 390 + 390/2 - ctx.measureText("Poivre : " + questionpoivre).width / 2, y / 2 - phpoints / 2 + 40);
+	ctx.fillText("Sel : " + questionsel, x / 2 - 800 + 390 / 2 - ctx.measureText("Sel : " + questionsel).width / 2, y / 2 - shpoints / 2 + 40);
+	ctx.fillText("Poivre : " + questionpoivre, x / 2 - 800 + 390 + 390 / 2 - ctx.measureText("Poivre : " + questionpoivre).width / 2, y / 2 - phpoints / 2 + 40);
 
 	var ans = "ans"
 	if (songindex >= 0)
@@ -1570,12 +1574,10 @@ function displaySel() {
 	if (selstop) {
 		ctx.strokeStyle = "green";
 		ctx.fillStyle = "white";
-		if (ans == "sel")
-		{
+		if (ans == "sel") {
 			roundRect(ctx, x / 2 - 800, y / 2 - shpoints / 2, 390, shpoints, 20, false);
 		}
-		else
-		{
+		else {
 			roundRect(ctx, x / 2 - 800 + 390, y / 2 - phpoints / 2, 390, phpoints, 20, false);
 		}
 	}
@@ -1605,7 +1607,7 @@ function displaySel() {
 
 		ctx.fillStyle = getUserColor(usr);
 		ctx.fillText(usr, x / 2 - 400 + 200 + colx - wmin / 2, 320 - phpoints / 2 + 220 + curi * 25);
-	}	
+	}
 }
 
 function displayYears() {
@@ -1915,7 +1917,7 @@ function preloadMulti() {
 		for (j = 0; j < songlist.find(x => x.listname === liste).songs[i].songs.length; j++) {
 			multisongs[i][j] = new Audio();
 			multisongs[i][j].src = "./multi/" + i + "/" + j + ".mp3";
-			multisongs[i][j].currentTime = 20;
+			multisongs[i][j].currentTime = 25;
 		}
 	}
 }
