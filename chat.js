@@ -6,8 +6,6 @@ var ws = new WebSocket("ws://192.168.1.13:8100");
 var x = 1900;
 var y = 920;
 
-//https://api.giphy.com/v1/stickers/search?api_key=[ta clef api ici&q=[mot clef]&&rating=G
-
 var members =
 	[
 		{ user: 'Personne', color: '#FF0000' },
@@ -27,7 +25,7 @@ var totalpoints = []
 
 var instruments = ['Batterie', 'Basse', 'Autre', 'Voix'];
 var categories = [' 1 ', ' 2 ', ' 3 ', ' 4 '];
-var colorcategories = ['#00DDEE', '#E02887', '#F5ED0B', '#31e62b'];
+var colorcategories = ['#00DDEE', '#E02887', '#F5ED0B', '#ccff99'];
 
 var tokens = [], points = [], voteprop = [], votes = [], collabblank = [], collabsongs = [], sel = [], poivre = [], multisongs = [], infonbwin = [];
 var tbfcollab = [], collabfound = [], chat = [], bonusletters = [], bonusprop = [], bonusans = [], singlewin = [], djviewers = [], years = [], gus = [], hintpic = []
@@ -35,7 +33,7 @@ var ready = false, songfound = false, info1found = false, info2found = false, gu
 
 var visiblepoints = false, visiblecollabpoints = false, visibletheme = false, visibletotalpoints = false, visiblevote = false, visiblewin = false, visibleyear = false, visiblesel = false, visiblegus = false, visiblebonus = false
 
-var debugInc = 0, delay = 0, numberfound = 0, songindex = 0, hintreveal = 0, countdownhint = 0, collabtime = 0
+var debugInc = 0, delay = 0, numberfound = 0, songindex = 0, hintreveal = 0, countdownhint = 0, collabtime = 0, singletime = 0;
 
 var collabpic = new Image();
 
@@ -45,7 +43,7 @@ var bonusfound = "false";
 var defaultdelay = 700;
 var seldelay = 1000;
 
-var defaultdelay = 0;
+//var defaultdelay = 0;
 
 var countdown = -1;
 var countdownsel = -1;
@@ -87,8 +85,8 @@ ws.onmessage = function (event) {
 		msg.user = "Mathilde_et_Gus";
 	}
 
-	// msg.user += (debugInc % 120).toString();
-	// debugInc++;
+	//  msg.user += (debugInc % 120).toString();
+	//  debugInc++;
 
 	if (msg.content.startsWith("!addpoints")) {
 		if (msg.isBroadcaster == "true") {
@@ -145,7 +143,7 @@ ws.onmessage = function (event) {
 	}
 	else if (msg.content.startsWith("!bonus")) {
 		if (msg.content == "!bonus") {
-			ws.send("!say Jeu bonus sur le principe du pendu ! Ca se passe en haut à droite. Tapez !bonus PROPOSITION pour tenter de trouver l\'artiste bonus ! 3 points pour la bonne réponse. Attention, un seul essai par thème ! Si vous avez gagné des tokens, tapez !bonus X pour tenter de dévoiler une lettre et gagner 1 point.");
+			ws.send("!say Jeu bonus sur le principe du pendu ! Ca se passe en haut à droite. Tapez !bonus PROPOSITION pour tenter de trouver l\'artiste bonus (Une seule tentative par thème) ! 3 points pour la bonne réponse. Si vous avez gagné des tokens (en trouvant en premier), tapez !bonus X pour tenter de dévoiler une lettre et gagner 1 point.");
 		}
 		else if (msg.content.startsWith("!bonus ") && bonusfound == "false") {
 
@@ -305,6 +303,7 @@ ws.onmessage = function (event) {
 				case 'sel':
 				case 'djviewers':
 					singlewin = [];
+					singletime = 0;
 					song = songlist.find(x => x.listname === liste).songs[songindex].name;
 					alternate = songlist.find(x => x.listname === liste).songs[songindex].alternate;
 					fullsongname = songlist.find(x => x.listname === liste).songs[songindex].fullname;
@@ -335,6 +334,7 @@ ws.onmessage = function (event) {
 					break;
 				case 'double':
 					doublewin = [[], []];
+					singletime = 0;
 					info1found = false;
 					info2found = false;
 					for (var i = 0; i < 2; i++) {
@@ -577,10 +577,10 @@ ws.onmessage = function (event) {
 			votes = [];
 		}
 	}
-	else if ((gametype == "single" || gametype == "trivial" || gametype == "collab" || gametype == "gus" || gametype == "djviewers") && ready == true) {
+	else if ((gametype == "single" || gametype == "trivial" || gametype == "collab" || gametype == "gus" || gametype == "djviewers") ) {
 		addChat(msg.user, msg.content, "", "yes");
 
-		if (songfound == false) {
+		if (songfound == false && ready) {
 			var lev = 0.75;
 
 			if (songlist.find(x => x.listname === liste).songs[songindex].lev != undefined)
@@ -604,7 +604,7 @@ ws.onmessage = function (event) {
 				if (singlewin.length >= 3) chat[chat.length - 1].found = "🍭";
 
 				if (singlewin.length < nbwin) {
-					singlewin.push({ 'user': msg.user });
+					singlewin.push({ 'user': msg.user, 'time': singletime});
 				}
 
 				if (singlewin.length == nbwin) {
@@ -718,7 +718,7 @@ ws.onmessage = function (event) {
 			}
 		}
 
-		if (gametype == "djviewers") {
+		if (gametype == "djviewers" && ready) {
 			if (!isNaN(parseInt(msg.content)) && songfound == false) {
 				var sample = parseInt(msg.content);
 				if (sample >= 0 && (sample <= songlist.find(x => x.listname === liste).songs[songindex].samples)) {
@@ -780,7 +780,7 @@ ws.onmessage = function (event) {
 					chat[chat.length - 1].cur = "yes" + i;
 
 					if (doublewin[i].length < infonbwin[i]) {
-						doublewin[i].push({ 'user': msg.user });
+						doublewin[i].push({ 'user': msg.user, 'time':singletime });
 					}
 				}
 
@@ -946,11 +946,13 @@ function drawCadre(color, height = 200, offset = 0) {
 
 function drawSingleWin() {
 	ctx.font = '20px Trebuchet MS';
-	drawCadre("green");
+	drawCadre("#ccff99");
 	var winnerswidth = 0;
 	for (var i = 0; i < singlewin.length; i++) {
 		winnerswidth += ctx.measureText("🥇 , ").width;
 		winnerswidth += ctx.measureText(singlewin[i].user).width;
+		winnerswidth += ctx.measureText(singlewin[i].time/100).width;
+		winnerswidth += ctx.measureText(" () ").width;
 	}
 	ctx.fillStyle = "white";
 	ctx.fillText("Félicitations à : ", x / 2 - 400 - ctx.measureText("Félicitations à :").width / 2, 160);
@@ -958,11 +960,11 @@ function drawSingleWin() {
 	var curposwin = 0;
 	for (var j = 0; j < singlewin.length; j++) {
 		ctx.fillStyle = getUserColor(singlewin[j].user);
-		if (j == 0) ctx.fillText("🥇" + singlewin[j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
-		if (j == 1) ctx.fillText("🥈" + singlewin[j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
-		if (j == 2) ctx.fillText("🥉" + singlewin[j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
-		if (j >= 3) ctx.fillText("🍭" + singlewin[j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
-		curposwin += ctx.measureText("🥇" + singlewin[j].user + " ").width;
+		if (j == 0) ctx.fillText("🥇" + singlewin[j].user + " (" + singlewin[j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
+		if (j == 1) ctx.fillText("🥈" + singlewin[j].user + " (" + singlewin[j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
+		if (j == 2) ctx.fillText("🥉" + singlewin[j].user + " (" + singlewin[j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
+		if (j >= 3) ctx.fillText("🍭" + singlewin[j].user + " (" + singlewin[j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 190);
+		curposwin += ctx.measureText("🥇" + singlewin[j].user + " " + " (" + singlewin[j].time/100 + ")").width;
 		ctx.fillStyle = "white";
 
 		if (j == singlewin.length - 1) {
@@ -981,6 +983,15 @@ function drawSingleWin() {
 	}
 	ctx.fillText(fullsongname, x / 2 - 400 - ctx.measureText(fullsongname).width / 2, 280);
 	ctx.font = '20px Trebuchet MS';
+
+	ctx.fillStyle = "black";
+	ctx.font = '40px Trebuchet MS';
+	ctx.clearRect(x / 2 - 750, 20, 150, 50);
+	ctx.fillRect(x / 2 - 750, 20, 150, 50)
+
+	ctx.fillStyle = "white";
+	ctx.fillText(singletime / 100 + "s", x / 2 - 750, 68);
+	ctx.font = '20px Trebuchet MS';
 }
 
 function drawSingleLose() {
@@ -993,6 +1004,15 @@ function drawSingleLose() {
 		ctx.font = '25px Trebuchet MS';
 	}
 	ctx.fillText(fullsongname, x / 2 - 400 - ctx.measureText(fullsongname).width / 2, 280);
+	ctx.font = '20px Trebuchet MS';
+
+	ctx.fillStyle = "black";
+	ctx.font = '40px Trebuchet MS';
+	ctx.clearRect(x / 2 - 750, 20, 150, 50);
+	ctx.fillRect(x / 2 - 750, 20, 150, 50)
+
+	ctx.fillStyle = "white";
+	ctx.fillText(singletime / 100 + "s", x / 2 - 750, 68);
 	ctx.font = '20px Trebuchet MS';
 }
 
@@ -1018,8 +1038,6 @@ function drawDoubleTags() {
 		ctx.fillText("2 informations à trouver :", x / 2 - 400 - ctx.measureText("2 informations à trouver :").width / 2, 160);
 	}
 
-
-
 	var info1 = songlist.find(x => x.listname === liste).info1;
 	var info2 = songlist.find(x => x.listname === liste).info2;
 	if (info1found == false) ctx.fillText(info1, x / 2 - 400 - ctx.measureText(info1).width / 2, 190);
@@ -1039,17 +1057,19 @@ function drawDoubleWin(info) {
 	for (var i = 0; i < doublewin[info].length; i++) {
 		winnerswidth += ctx.measureText("🥇 , ").width;
 		winnerswidth += ctx.measureText(doublewin[info][i].user).width;
+		winnerswidth += ctx.measureText(doublewin[info][i].time/100).width;
+		winnerswidth += ctx.measureText(" () ").width;
 	}
 	ctx.fillStyle = "white";
 
 	var curposwin = 0;
 	for (var j = 0; j < doublewin[info].length; j++) {
 		ctx.fillStyle = getUserColor(doublewin[info][j].user);
-		if (j == 0) ctx.fillText("🥇" + doublewin[info][j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
-		if (j == 1) ctx.fillText("🥈" + doublewin[info][j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
-		if (j == 2) ctx.fillText("🥉" + doublewin[info][j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
-		if (j >= 3) ctx.fillText("🍭" + doublewin[info][j].user, x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
-		curposwin += ctx.measureText("🥇" + doublewin[info][j].user + " ").width;
+		if (j == 0) ctx.fillText("🥇" + doublewin[info][j].user + " (" + doublewin[info][j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
+		if (j == 1) ctx.fillText("🥈" + doublewin[info][j].user + " (" + doublewin[info][j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
+		if (j == 2) ctx.fillText("🥉" + doublewin[info][j].user + " (" + doublewin[info][j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
+		if (j >= 3) ctx.fillText("🍭" + doublewin[info][j].user + " (" + doublewin[info][j].time/100 + ")", x / 2 - 400 - winnerswidth / 2 + curposwin, 220 + info * 60);
+		curposwin += ctx.measureText("🥇" + doublewin[info][j].user + " " + " (" + doublewin[info][j].time/100 + ")").width;
 		ctx.fillStyle = "white";
 
 		if (j == doublewin[info].length - 1) {
@@ -1060,6 +1080,15 @@ function drawDoubleWin(info) {
 			curposwin += ctx.measureText(", ").width;
 		}
 	}
+
+	ctx.fillStyle = "black";
+	ctx.font = '40px Trebuchet MS';
+	ctx.clearRect(x / 2 - 750, 20, 150, 50);
+	ctx.fillRect(x / 2 - 750, 20, 150, 50)
+
+	ctx.fillStyle = "white";
+	ctx.fillText(singletime / 100 + "s", x / 2 - 750, 68);
+	ctx.font = '20px Trebuchet MS';
 }
 
 function givePoints(win) {
@@ -1099,8 +1128,11 @@ function drawWinImage() {
 		var vRatio = 555 / img.height;
 
 		if (gametype == 'trivial' || gametype == 'year' || gametype == 'gus' || gametype == 'sel') {
-			var vRatio = 380 / img.height;
-			xslide = 820; yslide = -390;
+			vRatio = 380 / img.height;
+			if (gametype == 'year' || gametype == 'gus' || gametype == 'sel')
+			{
+				xslide = 820; yslide = -290;
+			}
 		}
 
 		var ratio = Math.min(hRatio, vRatio);
@@ -1174,7 +1206,7 @@ function drawQuiz() {
 	roundRect(ctx, x / 2 - 800, 338, 1500, 160, 20, true);
 
 	if (visiblewin == false) {
-		roundRect(ctx, x / 2 - 400, 515, 380, 380, 20, false);
+		roundRect(ctx, x / 2 - 400, 515, 380, 380, 20, true);
 		ctx.font = '28px Trebuchet MS';
 		ctx.fillStyle = 'white';
 		ctx.fillText("Instruments débloqués : ", x / 2 - 400 + 380 / 2 - ctx.measureText("Instruments débloqués :").width / 2, 560);
@@ -1263,7 +1295,7 @@ function redraw() {
 			drawCadre("white");
 		}
 		else {
-			drawCadre("green");
+			drawCadre("#ccff99");
 		}
 
 		drawDoubleTags();
@@ -1275,7 +1307,7 @@ function redraw() {
 	if (gametype == "multi") {
 
 		if (numberfound == 6) {
-			drawCadre("green");
+			drawCadre("#ccff99");
 		}
 		else {
 			drawCadre("red");
@@ -1572,7 +1604,7 @@ function displaySel() {
 	ctx.fillStyle = ctx.strokeStyle;
 
 	if (selstop) {
-		ctx.strokeStyle = "green";
+		ctx.strokeStyle = "#ccff99";
 		ctx.fillStyle = "white";
 		if (ans == "sel") {
 			roundRect(ctx, x / 2 - 800, y / 2 - shpoints / 2, 390, shpoints, 20, false);
@@ -1662,7 +1694,7 @@ function displayYears() {
 		var medal = " ";
 		if (songfound) {
 			if (yea == ansyear) {
-				ctx.fillStyle = "green";
+				ctx.fillStyle = "#ccff99";
 				medal = "🥇";
 			}
 			else if (Math.abs(yea - ansyear) == 1) {
@@ -1741,7 +1773,7 @@ function displayGus() {
 
 		if (gusstop) {
 			if (min == ansmin) {
-				ctx.fillStyle = "green";
+				ctx.fillStyle = "#ccff99";
 				medal = "🥇";
 			}
 			else if (Math.abs(min - ansmin) >= 1 && Math.abs(min - ansmin) <= 3) {
@@ -1885,8 +1917,12 @@ function fillCollab() {
 	drawCollab();
 
 	if (!ready) {
+		ctx.fillStyle = "black";
 		ctx.font = '40px Trebuchet MS';
 		ctx.clearRect(x / 2 - 750, 20, 150, 50);
+		ctx.fillRect(x / 2 - 750, 20, 150, 50)
+
+		ctx.fillStyle = "white";
 		ctx.fillText(collabtime / 100 + "s", x / 2 - 750, 68);
 		ctx.font = '20px Trebuchet MS';
 	}
@@ -1997,7 +2033,7 @@ function displayBonus() {
 			ctx.fillText("Lettres : ", x - 200 - ctx.measureText("Lettres : ").width - bonusword.length * 20, 190);
 			for (var i = 2; i < bonusprop.length; i++) {
 				if (bonusletters.some(item => item.letter === bonusprop[i].letter)) {
-					ctx.fillStyle = "green";
+					ctx.fillStyle = "#ccff99";
 				}
 				else {
 					ctx.fillStyle = "white";
@@ -2018,13 +2054,13 @@ function displayBonus() {
 		for (var i = 0; i < bonusword.length; i++) {
 			if (bonusprop.find(x => x.letter === bonusword.charAt(i)) != undefined) {
 				if (bonusfound != "false") {
-					ctx.fillStyle = "green";
+					ctx.fillStyle = "#ccff99";
 				}
 				ctx.fillText(bonusword.charAt(i), x - 180 - bonusword.length * 20 + i * 20 - ctx.measureText(bonusword.charAt(i)).width / 2, 154);
 			}
 			else if (bonusprop.find(x => x.letter === bonusword.charAt(i)) == undefined) {
 				if (bonusfound != "false") {
-					ctx.fillStyle = "green";
+					ctx.fillStyle = "#ccff99";
 				}
 				ctx.fillText("_", x - 180 - bonusword.length * 20 + i * 20 - ctx.measureText("_").width / 2, 154);
 			}
@@ -2264,14 +2300,30 @@ setInterval(function () {
 
 	if (ready && gametype == 'collab') {
 
+		ctx.fillstyle = "black";
 		ctx.font = '40px Trebuchet MS';
 		ctx.clearRect(x / 2 - 750, 20, 150, 50);
+		ctx.fillRect(x / 2 - 750, 20, 150, 50)
 		ctx.fillText(collabtime / 100 + "s", x / 2 - 750, 68);
 		ctx.font = '20px Trebuchet MS';
 
 		collabtime += 1;
 	}
 
+
+	if (ready && (gametype == 'single' || gametype == 'double' || gametype == 'trivial')){
+
+		ctx.fillStyle = "black";
+		ctx.font = '40px Trebuchet MS';
+		ctx.clearRect(x / 2 - 750, 20, 150, 50);
+		ctx.fillRect(x / 2 - 750, 20, 150, 50)
+
+		ctx.fillStyle = "white";
+		ctx.fillText(singletime / 100 + "s", x / 2 - 750, 68);
+		ctx.font = '20px Trebuchet MS';
+
+		singletime += 1;
+	}
 
 	if (countdown > 0) {
 		if (countdown % 100 == 0) {
